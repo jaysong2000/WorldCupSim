@@ -1444,14 +1444,14 @@
             let hP = calculateLiveLineupPowers(teams[hName], activeMatchSimulation.homeLineup);
             let aP = calculateLiveLineupPowers(teams[aName], activeMatchSimulation.awayLineup);
 
-            document.getElementById('live-label-home').innerText = `${hName} (Tactical Setup)`;
+            document.getElementById('live-label-home').innerText = `${hName}`;
             document.getElementById('live-power-home-text').innerHTML = `
-                • GK Safety: ${hP.gk}<br>• Defending: ${hP.df}<br>• Midfield Control: ${hP.mf}<br>• Attack: ${hP.fw}
+                • Goalkeeping: ${hP.gk}<br>• Defending: ${hP.df}<br>• Midfield: ${hP.mf}<br>• Attack: ${hP.fw}
             `;
 
-            document.getElementById('live-label-away').innerText = `${aName} (Tactical Setup)`;
+            document.getElementById('live-label-away').innerText = `${aName}`;
             document.getElementById('live-power-away-text').innerHTML = `
-                • GK Safety: ${aP.gk}<br>• Defending: ${aP.df}<br>• Midfield Control: ${aP.mf}<br>• Attack: ${aP.fw}
+                • Goalkeeping: ${aP.gk}<br>• Defending: ${aP.df}<br>• Midfield: ${aP.mf}<br>• Attack: ${aP.fw}
             `;
         }
 
