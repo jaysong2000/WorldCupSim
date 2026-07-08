@@ -843,7 +843,7 @@
                 card.className = 'group-card';
                 let title = document.createElement('div');
                 title.className = 'group-title';
-                title.innerText = `Group ${gName}`;
+                title.innerText = `${gName}`;
                 card.appendChild(title);
 
                 groups[gName].forEach(country => {
@@ -865,7 +865,7 @@
             select.innerHTML = '';
             Object.keys(groups).sort().forEach(gName => {
                 let opt = document.createElement('option');
-                opt.value = gName; opt.innerText = `Group ${gName}`;
+                opt.value = gName; opt.innerText = `${gName}`;
                 if (groups[gName].includes(userTeam)) opt.selected = true;
                 select.appendChild(opt);
             });
