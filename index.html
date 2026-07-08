@@ -1509,89 +1509,92 @@
         }
 
         function tickSimulationMinute() {
-            if (isSimPaused) return;
+    if (isSimPaused) return;
 
-            if (activeMatchSimulation.penalties) {
-                tickPenaltyShootoutTurn();
-                return;
-            }
+    if (activeMatchSimulation.penalties) {
+        tickPenaltyShootoutTurn();
+        return;
+    }
 
-            simMinute++;
-            
-            if (simMinute === 45 && !isHalftimeBreak) {
-                isSimPaused = true;
-                isHalftimeBreak = true;
-                clearInterval(matchIntervalTimer);
-                
-                appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Press Continue to resume.");
-                
-                activeMatchSimulation.sideFixtures.forEach(f => runAIReactiveSubs(f, true));
-                runAIReactiveSubs({ home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed }, true);
+    simMinute++;
+    
+    if (simMinute === 45 && !isHalftimeBreak) {
+        isSimPaused = true;
+        isHalftimeBreak = true;
+        clearInterval(matchIntervalTimer);
+        
+        appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Press Continue to resume.");
+        
+        // Run AI halftime subs for background matches
+        activeMatchSimulation.sideFixtures.forEach(f => runAIReactiveSubs(f, true));
+        
+        // Pass null to safely trigger halftime AI substitutions for the main match
+        runAIReactiveSubs(null, true);
 
-                let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
-                if (isUserInvolved && !teams[userTeam].eliminated) {
-                    document.getElementById('match-pause-btn').style.display = "none";
-                    document.getElementById('match-halftime-btn').style.display = "inline-block";
-                    document.getElementById('match-resume-ht-btn').style.display = "inline-block";
-                } else {
-                    setTimeout(() => {
-                        isSimPaused = false;
-                        isHalftimeBreak = false;
-                        matchIntervalTimer = setInterval(tickSimulationMinute, 150);
-                    }, 1000);
-                }
-                return;
-            }
-
-            let clockText = (simMinute < 10 ? '0' : '') + simMinute + ':00';
-            if (simMinute > 90) {
-                clockText = `ET ${simMinute}:00`;
-            }
-            document.getElementById('match-clock').innerText = clockText;
-
-            processInjuriesRngCheck(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'H');
-            processInjuriesRngCheck(activeMatchSimulation.away, activeMatchSimulation.awayLineup, 'A');
-            
-            if (simMinute > 55 && simMinute % 6 === 0) {
-                let proxyObj = { home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed };
-                runAIReactiveSubs(proxyObj, false);
-                activeMatchSimulation.homeSubsUsed = proxyObj.hSubsUsed;
-                activeMatchSimulation.awaySubsUsed = proxyObj.aSubsUsed;
-            }
-
-            activeMatchSimulation.sideFixtures.forEach(f => {
-                processInjuriesRngCheck(f.home || f.teamA, f.hLineup, 'H', true, f);
-                processInjuriesRngCheck(f.away || f.teamB, f.aLineup, 'A', true, f);
-                if (simMinute > 55 && simMinute % 6 === 0) runAIReactiveSubs(f, false);
-                
-                simulateMatchCalculationsForMinute(f.home || f.teamA, f.away || f.teamB, f.hLineup, f.aLineup, f, false);
-            });
-
-            let dummyRef = { hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore };
-            simulateMatchCalculationsForMinute(activeMatchSimulation.home, activeMatchSimulation.away, activeMatchSimulation.homeLineup, activeMatchSimulation.awayLineup, dummyRef, true);
-            activeMatchSimulation.homeScore = dummyRef.hScore;
-            activeMatchSimulation.awayScore = dummyRef.aScore;
-
-            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.homeScore} - ${activeMatchSimulation.awayScore}`;
-            renderLiveTeamSheets();
-            renderSideLiveMatchesList();
-
-            if (!activeMatchSimulation.extraTime && simMinute === 90) {
-                if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
-                    activeMatchSimulation.extraTime = true;
-                    appendCommentaryLine(90, "INFO", "⏱️ FULL TIME - EXTRA TIME");
-                } else {
-                    concludeActiveSimulationRun();
-                }
-            } else if (activeMatchSimulation.extraTime && simMinute === 120) {
-                if (activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
-                    initiatePenaltyShootoutSequence();
-                } else {
-                    concludeActiveSimulationRun();
-                }
-            }
+        let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
+        if (isUserInvolved && !teams[userTeam].eliminated) {
+            document.getElementById('match-pause-btn').style.display = "none";
+            document.getElementById('match-halftime-btn').style.display = "inline-block";
+            document.getElementById('match-resume-ht-btn').style.display = "inline-block";
+        } else {
+            setTimeout(() => {
+                isSimPaused = false;
+                isHalftimeBreak = false;
+                matchIntervalTimer = setInterval(tickSimulationMinute, 150);
+            }, 1000);
         }
+        return;
+    }
 
+    let clockText = (simMinute < 10 ? '0' : '') + simMinute + ':00';
+    if (simMinute > 90) {
+        clockText = `ET ${simMinute}:00`;
+    }
+    document.getElementById('match-clock').innerText = clockText;
+
+    processInjuriesRngCheck(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'H');
+    processInjuriesRngCheck(activeMatchSimulation.away, activeMatchSimulation.awayLineup, 'A');
+    
+    // --- MAIN MATCH AI SUBS TICK ---
+    // Every 6 simulated minutes after min 55, give the main match AI a chance to make a substitution
+    if (simMinute > 55 && simMinute % 6 === 0) {
+        runAIReactiveSubs(null, false); 
+    }
+
+    activeMatchSimulation.sideFixtures.forEach(f => {
+        processInjuriesRngCheck(f.home || f.teamA, f.hLineup, 'H', true, f);
+        processInjuriesRngCheck(f.away || f.teamB, f.aLineup, 'A', true, f);
+        
+        // --- BACKGROUND MATCHES AI SUBS TICK ---
+        if (simMinute > 55 && simMinute % 6 === 0) runAIReactiveSubs(f, false);
+        
+        simulateMatchCalculationsForMinute(f.home || f.teamA, f.away || f.teamB, f.hLineup, f.aLineup, f, false);
+    });
+
+    let dummyRef = { hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore };
+    simulateMatchCalculationsForMinute(activeMatchSimulation.home, activeMatchSimulation.away, activeMatchSimulation.homeLineup, activeMatchSimulation.awayLineup, dummyRef, true);
+    activeMatchSimulation.homeScore = dummyRef.hScore;
+    activeMatchSimulation.awayScore = dummyRef.aScore;
+
+    document.getElementById('match-live-score').innerText = `${activeMatchSimulation.homeScore} - ${activeMatchSimulation.awayScore}`;
+    renderLiveTeamSheets();
+    renderSideLiveMatchesList();
+
+    if (!activeMatchSimulation.extraTime && simMinute === 90) {
+        if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
+            activeMatchSimulation.extraTime = true;
+            appendCommentaryLine(90, "INFO", "⏱️ FULL TIME - EXTRA TIME");
+        } else {
+            concludeActiveSimulationRun();
+        }
+    } else if (activeMatchSimulation.extraTime && simMinute === 120) {
+        if (activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
+            initiatePenaltyShootoutSequence();
+        } else {
+            concludeActiveSimulationRun();
+        }
+    }
+}
        function initiatePenaltyShootoutSequence() {
             activeMatchSimulation.penalties = true;
             document.getElementById('match-clock').innerText = "PENS";
@@ -1782,12 +1785,45 @@
         }
 
         function runAIReactiveSubs(f, isHalftime) {
+        // 1. IF NO FIXTURE IS PASSED, RUN IT FOR THE MAIN ACTIVE MATCH
+        if (!f && activeMatchSimulation && !activeMatchSimulation.matchFinished) {
+            let hName = activeMatchSimulation.home;
+            let aName = activeMatchSimulation.away;
+    
+            if (hName !== userTeam) {
+                executeSingleAIReactiveSub(
+                    hName, 
+                    activeMatchSimulation.homeLineup, 
+                    activeMatchSimulation.homeSubsUsed, 
+                    activeMatchSimulation.homeScore, 
+                    activeMatchSimulation.awayScore, 
+                    isHalftime, 
+                    count => activeMatchSimulation.homeSubsUsed = count
+                );
+            }
+            if (aName !== userTeam) {
+                executeSingleAIReactiveSub(
+                    aName, 
+                    activeMatchSimulation.awayLineup, 
+                    activeMatchSimulation.awaySubsUsed, 
+                    activeMatchSimulation.awayScore, 
+                    activeMatchSimulation.homeScore, 
+                    isHalftime, 
+                    count => activeMatchSimulation.awaySubsUsed = count
+                );
+            }
+            return; // Exit out early
+        }
+    
+        // 2. OTHERWISE, RUN IT FOR BACKGROUND SIDE FIXTURES AS USUAL
+        if (f) {
             let hName = f.home || f.teamA;
             let aName = f.away || f.teamB;
-
+    
             if (hName !== userTeam) executeSingleAIReactiveSub(hName, f.hLineup, f.hSubsUsed, f.hScore, f.aScore, isHalftime, count => f.hSubsUsed = count);
             if (aName !== userTeam) executeSingleAIReactiveSub(aName, f.aLineup, f.aSubsUsed, f.aScore, f.hScore, isHalftime, count => f.aSubsUsed = count);
         }
+    }
 
        function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
     if (currentSubsCount >= MaxUserSubs) return;
