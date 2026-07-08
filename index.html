@@ -1838,7 +1838,7 @@
     // CAP: Enforce a maximum of 3 separate substitution windows/stoppages (excluding Halftime)
     if (!isHalftime && team.subStoppagesUsed >= 3) return;
 
-    let shouldSubstitute = (Math.random() < 0.25);
+    let shouldSubstitute = (Math.random() < 0.5);
     if (!shouldSubstitute) return;
 
     // Filter bench to find available players
