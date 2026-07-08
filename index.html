@@ -228,6 +228,17 @@
             border-bottom: 3px solid #444;
         }
 
+        /* Formations config menu styles */
+        .formation-select {
+            background: #2a2a2a;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
         /* Match Simulation Screen */
         .match-header {
             display: flex;
@@ -329,8 +340,16 @@
 
             <div class="dashboard-grid">
                 <div class="card">
-                    <h3>🛠️ Lineup & Formation Builder</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">Select exactly 1 GK and 10 Outfield players to create your tactical strategy.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">🛠️ Lineup & Formation Builder</h3>
+                        <select id="user-formation-select" class="formation-select" onchange="changeUserFormation()">
+                            <option value="4-4-2">Formation: 4-4-2</option>
+                            <option value="4-3-3">Formation: 4-3-3</option>
+                            <option value="3-5-2">Formation: 3-5-2</option>
+                            <option value="5-3-2">Formation: 5-3-2</option>
+                        </select>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Select exactly 1 GK and outfield players matching your tactical scheme, or build a custom layout.</p>
                     
                     <div class="rating-box">
                         <div class="rating-card" style="border-bottom-color: var(--gk-color)">
@@ -382,7 +401,7 @@
                                 <tbody id="standings-table-body"></tbody>
                             </table>
                         </div>
-                        <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
+                        <div id="standings-legend-note" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted);">
                             <span style="display:inline-block; width:12px; height:12px; background:rgba(46,125,50,0.25); margin-right:4px; vertical-align:middle;"></span> Top 2 Auto-Advance 
                             <span style="display:inline-block; width:12px; height:12px; background:rgba(251,192,45,0.15); margin-right:4px; margin-left:10px; vertical-align:middle;"></span> Best 3rd-Place Contenders
                         </div>
@@ -451,6 +470,14 @@
         let activeMatchEvents = [];
         let activeMatchEventIdx = 0;
 
+        // Formations Mapping Definitions
+        const FORMATIONS = {
+            "4-4-2": { DF: 4, MF: 4, FW: 2 },
+            "4-3-3": { DF: 4, MF: 3, FW: 3 },
+            "3-5-2": { DF: 3, MF: 5, FW: 2 },
+            "5-3-2": { DF: 5, MF: 3, FW: 2 }
+        };
+
         // Group Stage Schedule Pairings (0-indexed for 4 teams inside any group)
         const groupRoundsSchedule = [
             [ {t1: 0, t2: 1}, {t1: 2, t2: 3} ], // Round 1
@@ -515,6 +542,7 @@
                         points: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0,
                         eliminated: false,
                         stageReached: 'Group Stage',
+                        currentFormation: "4-4-2",
                         selectedLineupIds: [] // Stores FullNames of selected starting 11
                     };
                 }
@@ -556,7 +584,7 @@
                 groups[gName].forEach(country => {
                     let btn = document.createElement('button');
                     btn.className = 'team-select-btn';
-                    btn.innerText = `🏳️ ${country}`;
+                    btn.innerText = `${country}`; // Flags completely removed
                     btn.onclick = () => selectUserTeam(country);
                     card.appendChild(btn);
                 });
@@ -582,16 +610,32 @@
                 select.appendChild(opt);
             });
 
-            // Initialize default AI/User starting squad selections
-            autoPickStartingLineup(userTeam);
+            // Initialize formations and picking configurations for ALL competing teams
+            Object.keys(teams).forEach(cName => {
+                let availableFormations = Object.keys(FORMATIONS);
+                let randomForm = availableFormations[Math.floor(Math.random() * availableFormations.length)];
+                teams[cName].currentFormation = (cName === userTeam) ? "4-4-2" : randomForm;
+                autoPickStartingLineup(cName);
+            });
             
+            document.getElementById('user-formation-select').value = "4-4-2";
             showScreen('screen-dashboard');
             refreshDashboard();
         }
 
-        // Tactical AI Selection Lineup Algorithm
+        function changeUserFormation() {
+            let selectedForm = document.getElementById('user-formation-select').value;
+            teams[userTeam].currentFormation = selectedForm;
+            autoPickStartingLineup(userTeam);
+            renderSquadManagement();
+            validateUserLineup();
+        }
+
+        // Picking Lineup mapping to tactical formation structures
         function autoPickStartingLineup(countryName) {
             let team = teams[countryName];
+            let targetConfig = FORMATIONS[team.currentFormation] || FORMATIONS["4-4-2"];
+
             let gks = team.players.filter(p => p.Position === 'GK').sort((a,b) => b.Ability - a.Ability);
             let dfs = team.players.filter(p => p.Position === 'DF').sort((a,b) => b.Ability - a.Ability);
             let mfs = team.players.filter(p => p.Position === 'MF').sort((a,b) => b.Ability - a.Ability);
@@ -599,28 +643,28 @@
 
             let chosen = [];
             if(gks[0]) chosen.push(gks[0].FullName);
-            
-            // Evaluate optimal formation dynamically (4-3-3 vs 4-4-2 based on depth strength)
-            if (fws[2] && mfs[3] && fws[2].Ability > mfs[3].Ability) {
-                // 4-3-3
-                dfs.slice(0, 4).forEach(p => chosen.push(p.FullName));
-                mfs.slice(0, 3).forEach(p => chosen.push(p.FullName));
-                fws.slice(0, 3).forEach(p => chosen.push(p.FullName));
-            } else {
-                // Default standard 4-4-2
-                dfs.slice(0, 4).forEach(p => chosen.push(p.FullName));
-                mfs.slice(0, 4).forEach(p => chosen.push(p.FullName));
-                fws.slice(0, 2).forEach(p => chosen.push(p.FullName));
+
+            dfs.slice(0, targetConfig.DF).forEach(p => chosen.push(p.FullName));
+            mfs.slice(0, targetConfig.MF).forEach(p => chosen.push(p.FullName));
+            fws.slice(0, targetConfig.FW).forEach(p => chosen.push(p.FullName));
+
+            // Fallback safety if squad lacks depth in certain fields
+            if (chosen.length < 11) {
+                let allSorted = [...team.players].sort((a,b) => b.Ability - a.Ability);
+                for(let p of allSorted) {
+                    if (chosen.length >= 11) break;
+                    if (!chosen.includes(p.FullName)) chosen.push(p.FullName);
+                }
             }
+
             team.selectedLineupIds = chosen;
         }
 
         function refreshDashboard() {
-            document.getElementById('dash-team-name').innerText = `🏳️ ${userTeam}`;
+            document.getElementById('dash-team-name').innerText = `${userTeam}`; // Clear clean team title text
             
             if (currentStage === 'Group Stage') {
-                document.getElementById('dash-stage-info').innerText = `Group Stage - Round ${currentRound} of 3\u00A0\u00A0|\u00A0\u00A0${teams[userTeam].group}`;
-                // Determine upcoming fixture
+                document.getElementById('dash-stage-info').innerText = `Group Stage - Round ${currentRound} of 3  |  ${teams[userTeam].group}`;
                 let match = getGroupFixtureForRound(teams[userTeam].group, userTeam, currentRound);
                 let opp = (match.home === userTeam) ? match.away : match.home;
                 document.getElementById('next-opponent').innerText = `${opp} (${match.home === userTeam ? 'Home' : 'Away'})`;
@@ -645,7 +689,6 @@
             container.innerHTML = '';
             
             let team = teams[userTeam];
-            // Sort players by position priority then ability descending
             let posOrder = {'GK':1, 'DF':2, 'MF':3, 'FW':4};
             let sortedPlayers = [...team.players].sort((a,b) => {
                 if(posOrder[a.Position] !== posOrder[b.Position]) return posOrder[a.Position] - posOrder[b.Position];
@@ -655,7 +698,6 @@
             sortedPlayers.forEach(p => {
                 let row = document.createElement('div');
                 row.className = 'player-row';
-                
                 let isChecked = team.selectedLineupIds.includes(p.FullName) ? 'checked' : '';
                 
                 row.innerHTML = `
@@ -685,7 +727,6 @@
             }
             calculateSquadPowersAndReadout();
             validateUserLineup();
-            document.getElementById('selection-count').innerText = `Selected: ${team.selectedLineupIds.length} / 11`;
         }
 
         function calculateSquadPowersAndReadout() {
@@ -697,17 +738,17 @@
             let mf = activePlayers.filter(p => p.Position === 'MF');
             let fw = activePlayers.filter(p => p.Position === 'FW');
 
-            let gkPower = gk.reduce((sum, p) => sum + p.Ability, 0);
-            let dfPower = df.reduce((sum, p) => sum + p.Ability, 0);
-            let mfPower = mf.reduce((sum, p) => sum + p.Ability, 0);
-            let fwPower = fw.reduce((sum, p) => sum + p.Ability, 0);
+            let gkPower = Math.round((gk.reduce((sum, p) => sum + p.Ability, 0) / (gk.length || 1)));
+            let dfPower = Math.round((df.reduce((sum, p) => sum + p.Ability, 0) / (df.length || 1)));
+            let mfPower = Math.round((mf.reduce((sum, p) => sum + p.Ability, 0) / (mf.length || 1)));
+            let fwPower = Math.round((fw.reduce((sum, p) => sum + p.Ability, 0) / (fw.length || 1)));
 
-            document.getElementById('power-gk').innerText = gkPower || 0;
-            document.getElementById('power-df').innerText = dfPower || 0;
-            document.getElementById('power-mf').innerText = mfPower || 0;
-            document.getElementById('power-fw').innerText = fwPower || 0;
+            document.getElementById('power-gk').innerText = gk.length ? gkPower : 0;
+            document.getElementById('power-df').innerText = df.length ? dfPower : 0;
+            document.getElementById('power-mf').innerText = mf.length ? mfPower : 0;
+            document.getElementById('power-fw').innerText = fw.length ? fwPower : 0;
 
-            document.getElementById('formation-readout').innerText = `Formation: ${df.length}-${mf.length}-${fw.length}`;
+            document.getElementById('formation-readout').innerText = `Formation Layout: ${df.length}-${mf.length}-${fw.length}`;
             document.getElementById('selection-count').innerText = `Selected: ${activePlayers.length} / 11`;
 
             return { gk: gk.length, df: df.length, mf: mf.length, fw: fw.length, total: activePlayers.length };
@@ -733,7 +774,7 @@
                 return;
             }
             if (counts.gk !== 1) {
-                errorMsg.innerText = `Lineup invalid: You must select exactly 1 Goalkeeper. Currently: ${counts.gk}`;
+                errorMsg.innerText = `Lineup invalid: You must select exactly 1 Goalkeeper.`;
                 errorMsg.style.color = "var(--fw-color)";
                 playBtn.disabled = true;
                 return;
@@ -758,6 +799,18 @@
             return null;
         }
 
+        function getSortedGroupTeams(gName) {
+            let list = [...groups[gName]];
+            list.sort((a,b) => {
+                let tA = teams[a];
+                let tB = teams[b];
+                if(tB.points !== tA.points) return tB.points - tA.points;
+                if(tB.gd !== tA.gd) return tB.gd - tA.gd;
+                return tB.gf - tA.gf;
+            });
+            return list;
+        }
+
         function renderStandingsTable() {
             let select = document.getElementById('group-view-select');
             let selectedGroup = select.value || teams[userTeam].group;
@@ -765,6 +818,7 @@
             tbody.innerHTML = '';
 
             if (currentStage === 'Group Stage') {
+                document.getElementById('standings-legend-note').style.display = "block";
                 let sortedTeams = getSortedGroupTeams(selectedGroup);
                 sortedTeams.forEach((tName, index) => {
                     let t = teams[tName];
@@ -775,7 +829,7 @@
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName === userTeam ? '⭐ ' : ''}${tName}</td>
-                        <td>3</td>
+                        <td>${t.won + t.drawn + t.lost}</td>
                         <td>${t.won}</td>
                         <td>${t.drawn}</td>
                         <td>${t.lost}</td>
@@ -785,431 +839,429 @@
                     tbody.appendChild(row);
                 });
             } else {
-                // Show generalized overview of the knockout structure instead of group listings
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--gold);">Knockout Phase Active. Standing tables concluded.</td></tr>`;
+                document.getElementById('standings-legend-note').style.display = "none";
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--gold); font-weight:bold; padding:30px;">Knockout Phase Active (${knockoutRoundName})<br><span style="color:#888; font-size:0.85rem; font-weight:normal;">Standing groups concluded. Sudden death single matches active.</span></td></tr>`;
             }
         }
 
-        function getSortedGroupTeams(gName) {
-            return [...groups[gName]].sort((a, b) => {
-                let tA = teams[a];
-                let tB = teams[b];
-                if (tB.points !== tA.points) return tB.points - tA.points;
-                if (tB.gd !== tA.gd) return tB.gd - tA.gd;
-                if (tB.gf !== tA.gf) return tB.gf - tA.gf;
-                return a.localeCompare(b);
-            });
+        // Get overall index rating calculations based on selected starting 11
+        function getTeamRating(countryName) {
+            let team = teams[countryName];
+            let selected = team.players.filter(p => team.selectedLineupIds.includes(p.FullName));
+            if(selected.length === 0) return 60;
+            return selected.reduce((sum, p) => sum + p.Ability, 0) / selected.length;
         }
 
-        // Mathematical Engine core match algorithm
-        function executeMatchSimulationLogic(teamA_Obj, teamB_Obj, lineupA, lineupB, isKnockout) {
-            let gk_A = lineupA.find(p => p.Position === 'GK').Ability;
-            let df_A = lineupA.filter(p => p.Position === 'DF').reduce((sum, p) => sum + p.Ability, 0);
-            let mf_A = lineupA.filter(p => p.Position === 'MF').reduce((sum, p) => sum + p.Ability, 0);
-            let fw_A = lineupA.filter(p => p.Position === 'FW').reduce((sum, p) => sum + p.Ability, 0);
-
-            let gk_B = lineupB.find(p => p.Position === 'GK').Ability;
-            let df_B = lineupB.filter(p => p.Position === 'DF').reduce((sum, p) => sum + p.Ability, 0);
-            let mf_B = lineupB.filter(p => p.Position === 'MF').reduce((sum, p) => sum + p.Ability, 0);
-            let fw_B = lineupB.filter(p => p.Position === 'FW').reduce((sum, p) => sum + p.Ability, 0);
-
-            let numChances = 4 + Math.floor(Math.random() * 5); // 4 to 8 chances per game
+        // Match Engine Core
+        function generateMatchEvents(teamA, teamB, isKnockout) {
+            let rA = getTeamRating(teamA);
+            let rB = getTeamRating(teamB);
+            
+            let events = [];
             let scoreA = 0;
             let scoreB = 0;
-            let events = [];
 
-            events.push({ min: 0, type: 'info', text: `⚽ Kickoff between ${teamA_Obj.name} and ${teamB_Obj.name}!` });
-
-            for (let c = 0; c < numChances; c++) {
-                let min = Math.floor(((c + 1) / numChances) * 90) - Math.floor(Math.random() * 4);
-                if (min <= 0) min = 5;
-
-                let totalMF = mf_A + mf_B || 1;
-                if (Math.random() < (mf_A / totalMF)) {
-                    // Team A Attack Chance
-                    let scoringProb = (fw_A) / (fw_A + df_B + gk_B * 0.5) * 0.45;
-                    if (Math.random() < scoringProb) {
+            // 1. Simulate Regulation 90 Minutes
+            let attackChances = 5 + Math.floor(Math.random() * 5);
+            for(let i=0; i<attackChances; i++) {
+                let min = Math.floor(((i+1)/attackChances) * 90);
+                let rand = Math.random() * (rA + rB);
+                if(rand < rA) {
+                    // Team A attacks
+                    if(Math.random() * rB < rA * 0.28) {
                         scoreA++;
-                        let pool = [];
-                        lineupA.forEach(p => {
-                            if(p.Position === 'FW') pool.push(p, p, p);
-                            if(p.Position === 'MF') pool.push(p, p);
-                            if(p.Position === 'DF') pool.push(p);
-                        });
-                        let scorer = pool[Math.floor(Math.random() * pool.length)]?.FullName || 'Striker';
-                        events.push({ min: min, type: 'goal', text: `⚽ GOAL! ${scorer} finishes expertly for ${teamA_Obj.name}! (${scoreA}-${scoreB})` });
+                        events.push({ min: min, type: 'goal', team: 'A', text: `⚽ GOAL! Clean combination build-up allows ${teamA} to hit the target. Score: ${scoreA} - ${scoreB}` });
                     } else {
-                        events.push({ min: min, type: 'miss', text: `👟 Chance for ${teamA_Obj.name} is blocked or saved beautifully.` });
+                        events.push({ min: min, type: 'miss', team: 'A', text: `🏃 Chance for ${teamA}! A powerful strike flashes just past the post.` });
                     }
                 } else {
-                    // Team B Attack Chance
-                    let scoringProb = (fw_B) / (fw_B + df_A + gk_A * 0.5) * 0.45;
-                    if (Math.random() < scoringProb) {
+                    // Team B attacks
+                    if(Math.random() * rA < rB * 0.28) {
                         scoreB++;
-                        let pool = [];
-                        lineupB.forEach(p => {
-                            if(p.Position === 'FW') pool.push(p, p, p);
-                            if(p.Position === 'MF') pool.push(p, p);
-                            if(p.Position === 'DF') pool.push(p);
-                        });
-                        let scorer = pool[Math.floor(Math.random() * pool.length)]?.FullName || 'Striker';
-                        events.push({ min: min, type: 'goal', text: `⚽ GOAL! ${scorer} tracks down a defense leak to score for ${teamB_Obj.name}! (${scoreA}-${scoreB})` });
+                        events.push({ min: min, type: 'goal', team: 'B', text: `⚽ GOAL! ${teamB} forces a defensive mistake and scores. Score: ${scoreA} - ${scoreB}` });
                     } else {
-                        events.push({ min: min, type: 'miss', text: `👟 ${teamB_Obj.name} pushes into the box but the keeper secures the ball.` });
+                        events.push({ min: min, type: 'miss', team: 'B', text: `🧤 Threatening cross cleared by the defensive backline of ${teamA}.` });
                     }
                 }
             }
 
-            // Knockout resolution overrides (Extra Time and Penalties)
-            let winner = 'Draw';
-            let penaltyText = "";
+            events.push({ min: 90, type: 'info', text: `⏰ 90 Minutes Completed. Score: ${scoreA} - ${scoreB}` });
 
-            if (scoreA === scoreB && isKnockout) {
-                events.push({ min: 90, type: 'info', text: `⏰ Full time tie! Proceeding to Extra Time.` });
-                // Extra time simulation
-                for (let et = 0; et < 2; et++) {
-                    let min = 98 + et * 10;
-                    if (Math.random() < (mf_A / (mf_A + mf_B))) {
-                        if (Math.random() < (fw_A / (fw_A + df_B + gk_B * 0.5) * 0.45)) {
+            // 2. Extra Time Handler (120 mins) - Only for Knockout matches that finish tied at 90
+            let wentToET = false;
+            let wentToPenalties = false;
+            let penA = 0;
+            let penB = 0;
+
+            if (isKnockout && scoreA === scoreB) {
+                wentToET = true;
+                events.push({ min: 90, type: 'info', text: `⚔️ Match TIED at Full Time! Moving into 30 minutes of Extra Time (120 Mins total)...` });
+                
+                // Simulate extra time chances
+                for (let i = 1; i <= 3; i++) {
+                    let etMin = 90 + (i * 10);
+                    let rand = Math.random() * (rA + rB);
+                    if (rand < rA) {
+                        if (Math.random() < 0.15) { // Fatigue lower conversion
                             scoreA++;
-                            events.push({ min: min, type: 'goal', text: `⚽ EXTRA TIME GOAL! ${teamA_Obj.name} takes the lead! (${scoreA}-${scoreB})` });
+                            events.push({ min: etMin, type: 'goal', team: 'A', text: `⚽ EXTRA TIME GOAL! ${teamA} breaks the deadlock! Score: ${scoreA} - ${scoreB}` });
                         }
                     } else {
-                        if (Math.random() < (fw_B / (fw_B + df_A + gk_A * 0.5) * 0.45)) {
+                        if (Math.random() < 0.15) {
                             scoreB++;
-                            events.push({ min: min, type: 'goal', text: `⚽ EXTRA TIME GOAL! ${teamB_Obj.name} response is instantaneous! (${scoreA}-${scoreB})` });
+                            events.push({ min: etMin, type: 'goal', team: 'B', text: `⚽ EXTRA TIME GOAL! ${teamB} answers right back! Score: ${scoreA} - ${scoreB}` });
                         }
                     }
                 }
+                events.push({ min: 120, type: 'info', text: `⏰ Extra Time Concluded. Score: ${scoreA} - ${scoreB}` });
 
+                // 3. Penalty Shootout Handler - Only if still tied after 120 minutes
                 if (scoreA === scoreB) {
-                    events.push({ min: 120, type: 'info', text: `⏰ Still tied after Extra Time! Penalty Shootout begins.` });
-                    let pensA = 0, pensB = 0;
-                    let penLogs = [];
-                    for (let r = 1; r <= 5; r++) {
-                        let okA = Math.random() < 0.75; if (okA) pensA++;
-                        let okB = Math.random() < 0.75; if (okB) pensB++;
-                        penLogs.push(`R${r}: ${teamA_Obj.name} ${okA?'✔':'✘'} | ${teamB_Obj.name} ${okB?'✔':'✘'}`);
-                        if (pensA + (5 - r) < pensB || pensB + (5 - r) < pensA) break;
+                    wentToPenalties = true;
+                    events.push({ min: 120, type: 'info', text: `🥅 STILL TIED after 120 minutes! Proceeding to a dramatic Penalty Shootout...` });
+
+                    // Standard best of 5 rounds
+                    let round = 1;
+                    for (round = 1; round <= 5; round++) {
+                        let shotA = Math.random() < 0.75;
+                        let shotB = Math.random() < 0.75;
+                        if(shotA) penA++;
+                        if(shotB) penB++;
+                        events.push({ min: 120, type: 'info', text: `Round ${round} Pens: ${teamA} ${shotA ? '✅':'❌'} | ${teamB} ${shotB ? '✅':'❌'} (Shootout total: ${penA}-${penB})` });
                     }
-                    let rCount = 6;
-                    while (pensA === pensB) {
-                        let okA = Math.random() < 0.75; if (okA) pensA++;
-                        let okB = Math.random() < 0.75; if (okB) pensB++;
-                        penLogs.push(`Sudden Death R${rCount}: ${okA?'✔':'✘'} vs ${okB?'✔':'✘'}`);
-                        rCount++;
+
+                    // Sudden death if tied after 5 penalties each
+                    while (penA === penB) {
+                        let shotA = Math.random() < 0.75;
+                        let shotB = Math.random() < 0.75;
+                        if(shotA) penA++;
+                        if(shotB) penB++;
+                        events.push({ min: 120, type: 'info', text: `Sudden Death Pens: ${teamA} ${shotA ? '✅':'❌'} | ${teamB} ${shotB ? '✅':'❌'} (Shootout total: ${penA}-${penB})` });
                     }
-                    winner = pensA > pensB ? 'A' : 'B';
-                    penaltyText = ` (Pens: ${pensA}-${pensB})`;
-                    events.push({ min: 125, type: 'info', text: `🎯 Shootout Result: ${penLogs.join(' | ')}` });
-                } else {
-                    winner = scoreA > scoreB ? 'A' : 'B';
+
+                    events.push({ min: 120, type: 'info', text: `🏆 Penalty Shootout Finished! Winner: ${penA > penB ? teamA : teamB} (${penA} - ${penB})` });
                 }
-            } else {
-                winner = scoreA > scoreB ? 'A' : (scoreA < scoreB ? 'B' : 'Draw');
             }
 
-            events.push({ min: 120, type: 'info', text: `🏁 Match Finished. Final score line: ${scoreA} - ${scoreB}${penaltyText}` });
-
-            return { scoreA, scoreB, winner, events, penaltyText };
+            return {
+                teamA: teamA, teamB: teamB,
+                scoreA: scoreA, scoreB: scoreB,
+                wentToET: wentToET,
+                wentToPenalties: wentToPenalties,
+                penA: penA, penB: penB,
+                winner: wentToPenalties ? (penA > penB ? teamA : teamB) : (scoreA > scoreB ? teamA : (scoreB > scoreA ? teamB : 'Draw')),
+                events: events
+            };
         }
 
-        // Run full fixture simulations for the current tournament step
         function startMatchSimulation() {
             showScreen('screen-match');
-            let commBox = document.getElementById('match-commentary');
-            commBox.innerHTML = '';
-            document.getElementById('match-skip-btn').style.display = 'inline-block';
-            document.getElementById('match-continue-btn').style.display = 'none';
-
-            let sidePanel = document.getElementById('simultaneous-match-results');
-            sidePanel.innerHTML = '';
-
-            let userFixture = null;
-            let otherFixturesSimResults = [];
+            let mainMatch = null;
 
             if (currentStage === 'Group Stage') {
-                // Determine user fixture in their group
-                let userGroup = teams[userTeam].group;
-                let teamList = groups[userGroup];
-                let pairings = groupRoundsSchedule[currentRound - 1];
-                
-                pairings.forEach(p => {
-                    let hName = teamList[p.t1];
-                    let aName = teamList[p.t2];
-                    
-                    let hLineup = (hName === userTeam) ? teams[hName].players.filter(pl => teams[hName].selectedLineupIds.includes(pl.FullName)) : getAILineup(hName);
-                    let aLineup = (aName === userTeam) ? teams[aName].players.filter(pl => teams[aName].selectedLineupIds.includes(pl.FullName)) : getAILineup(aName);
-                    
-                    let res = executeMatchSimulationLogic(teams[hName], teams[aName], hLineup, aLineup, false);
-                    
-                    if (hName === userTeam || aName === userTeam) {
-                        userFixture = { home: hName, away: aName, res: res };
-                    } else {
-                        applyGroupStats(hName, aName, res.scoreA, res.scoreB);
-                        otherFixturesSimResults.push(`${hName} ${res.scoreA} - ${res.scoreB} ${aName}`);
-                    }
-                });
-
-                // Simulate all other groups matches simultaneously
-                for (let gName in groups) {
-                    if (gName === userGroup) continue;
-                    let gTeams = groups[gName];
-                    let gPairings = groupRoundsSchedule[currentRound - 1];
-                    gPairings.forEach(p => {
-                        let h = gTeams[p.t1];
-                        let a = gTeams[p.t2];
-                        let res = executeMatchSimulationLogic(teams[h], teams[a], getAILineup(h), getAILineup(a), false);
-                        applyGroupStats(h, a, res.scoreA, res.scoreB);
-                        otherFixturesSimResults.push(`[${gName}] ${h} ${res.scoreA} - ${res.scoreB} ${a}`);
-                    });
-                }
-
+                mainMatch = getGroupFixtureForRound(teams[userTeam].group, userTeam, currentRound);
             } else {
-                // Knockout Phase Simulation Logic
-                knockoutMatches.forEach((m, idx) => {
-                    let hLineup = (m.teamA === userTeam) ? teams[m.teamA].players.filter(p => teams[m.teamA].selectedLineupIds.includes(p.FullName)) : getAILineup(m.teamA);
-                    let aLineup = (m.teamB === userTeam) ? teams[m.teamB].players.filter(p => teams[m.teamB].selectedLineupIds.includes(p.FullName)) : getAILineup(m.teamB);
-                    
-                    let res = executeMatchSimulationLogic(teams[m.teamA], teams[m.teamB], hLineup, aLineup, true);
-                    m.scoreA = res.scoreA;
-                    m.scoreB = res.scoreB;
-                    m.winner = (res.winner === 'A') ? m.teamA : m.teamB;
-                    m.penaltyText = res.penaltyText;
-                    
-                    if (m.teamA === userTeam || m.teamB === userTeam) {
-                        userFixture = { home: m.teamA, away: m.teamB, res: res };
-                    } else {
-                        // Eliminate loser tracking
-                        let loser = (m.winner === m.teamA) ? m.teamB : m.teamA;
-                        teams[loser].eliminated = true;
-                        teams[loser].stageReached = knockoutRoundName;
-                        otherFixturesSimResults.push(`${m.teamA} ${res.scoreA} - ${res.scoreB} ${m.teamB}${res.penaltyText || ''}`);
-                    }
-                });
-
-                // If user was already eliminated, pick the first match of the round to animate
-                if (!userFixture) {
-                    let firstM = knockoutMatches[0];
-                    let hLineup = getAILineup(firstM.teamA);
-                    let aLineup = getAILineup(firstM.teamB);
-                    let res = executeMatchSimulationLogic(teams[firstM.teamA], teams[firstM.teamB], hLineup, aLineup, true);
-                    userFixture = { home: firstM.teamA, away: firstM.teamB, res: res };
+                mainMatch = knockoutMatches.find(m => m.teamA === userTeam || m.teamB === userTeam);
+                if (!mainMatch) {
+                    // User is eliminated, track first incomplete knockout match as viewer
+                    mainMatch = knockoutMatches[currentKnockoutIndex];
                 }
             }
 
-            // Execute post-simulation rendering updates
-            if (currentStage === 'Group Stage') {
-                applyGroupStats(userFixture.home, userFixture.away, userFixture.res.scoreA, userFixture.res.scoreB);
-            } else {
-                let mObj = knockoutMatches.find(m => m.teamA === userFixture.home && m.teamB === userFixture.away);
-                if (mObj) {
-                    let loser = (mObj.winner === mObj.teamA) ? mObj.teamB : mObj.teamA;
-                    teams[loser].eliminated = true;
-                    teams[loser].stageReached = knockoutRoundName;
-                }
-            }
-
-            // Print side matches to dashboard right away
-            otherFixturesSimResults.forEach(text => {
-                let div = document.createElement('div');
-                div.style.padding = '4px 0';
-                div.style.borderBottom = '1px solid #222';
-                div.innerText = text;
-                sidePanel.appendChild(div);
-            });
-
-            // Set up active visual commentary animation
-            document.getElementById('match-teamA-name').innerText = userFixture.home;
-            document.getElementById('match-teamB-name').innerText = userFixture.away;
-            document.getElementById('match-live-score').innerText = '0 - 0';
-
-            activeMatchSimulation = userFixture;
-            activeMatchEvents = userFixture.res.events;
+            activeMatchSimulation = generateMatchEvents(mainMatch.home || mainMatch.teamA, mainMatch.away || mainMatch.teamB, currentStage !== 'Group Stage');
+            activeMatchEvents = activeMatchSimulation.events;
             activeMatchEventIdx = 0;
 
-            matchIntervalTimer = setInterval(animateNextCommentaryLine, 800);
-        }
-
-        function getAILineup(countryName) {
-            let team = teams[countryName];
-            let gks = team.players.filter(p => p.Position === 'GK').sort((a,b) => b.Ability - a.Ability);
-            let dfs = team.players.filter(p => p.Position === 'DF').sort((a,b) => b.Ability - a.Ability);
-            let mfs = team.players.filter(p => p.Position === 'MF').sort((a,b) => b.Ability - a.Ability);
-            let fws = team.players.filter(p => p.Position === 'FW').sort((a,b) => b.Ability - a.Ability);
+            document.getElementById('match-teamA-name').innerText = activeMatchSimulation.teamA;
+            document.getElementById('match-teamB-name').innerText = activeMatchSimulation.teamB;
+            document.getElementById('match-live-score').innerText = "0 - 0";
             
-            // Standard AI Selection configuration (4-4-2 default)
-            return [gks[0], dfs[0], dfs[1], dfs[2], dfs[3], mfs[0], mfs[1], mfs[2], mfs[3], fws[0], fws[1]].filter(Boolean);
-        }
+            let commentaryBox = document.getElementById('match-commentary');
+            commentaryBox.innerHTML = `<div class="commentary-line info">🏁 Match Kickoff! Tactics built. Let's head down to the pitch...</div>`;
+            
+            document.getElementById('match-skip-btn').style.display = "inline-block";
+            document.getElementById('match-continue-btn').style.display = "none";
 
-        function applyGroupStats(home, away, sA, sB) {
-            let tA = teams[home];
-            let tB = teams[away];
+            // Run simultaneous matchday background calculations
+            simulateOtherMatchesOnDay();
 
-            tA.gf += sA; tA.ga += sB; tA.gd += (sA - sB);
-            tB.gf += sB; tB.ga += sA; tB.gd += (sB - sA);
-
-            if (sA > sB) { tA.won++; tA.points += 3; tB.lost++; }
-            else if (sA < sB) { tB.won++; tB.points += 3; tA.lost++; }
-            else { tA.drawn++; tA.points += 1; tB.drawn++; tB.points += 1; }
-        }
-
-        function animateNextCommentaryLine() {
-            if (activeMatchEventIdx >= activeMatchEvents.length) {
-                clearInterval(matchIntervalTimer);
-                document.getElementById('match-skip-btn').style.display = 'none';
-                document.getElementById('match-continue-btn').style.display = 'inline-block';
-                return;
-            }
-
-            let ev = activeMatchEvents[activeMatchEventIdx];
-            let commBox = document.getElementById('match-commentary');
-            let div = document.createElement('div');
-            div.className = `commentary-line ${ev.type}`;
-            div.innerText = `[Min ${ev.min}'] ${ev.text}`;
-            commBox.appendChild(div);
-            commBox.scrollTop = commBox.scrollHeight;
-
-            // Dynamically scan for intermediate scores
-            if (ev.text.includes('(') && ev.text.includes('-')) {
-                let match = ev.text.match(/\((\d+)-(\d+)\)/);
-                if (match) {
-                    document.getElementById('match-live-score').innerText = `${match[1]} - ${match[2]}`;
+            matchIntervalTimer = setInterval(() => {
+                if(activeMatchEventIdx >= activeMatchEvents.length) {
+                    clearInterval(matchIntervalTimer);
+                    document.getElementById('match-skip-btn').style.display = "none";
+                    document.getElementById('match-continue-btn').style.display = "inline-block";
+                    return;
                 }
-            }
-            if (ev.text.includes('Final score line:')) {
-                let match = ev.text.match(/line:\s*(\d+)\s*-\s*(\d+)/);
-                if (match) {
-                    document.getElementById('match-live-score').innerText = `${match[1]} - ${match[2]}`;
-                }
-            }
+                
+                let ev = activeMatchEvents[activeMatchEventIdx];
+                let line = document.createElement('div');
+                line.className = `commentary-line ${ev.type}`;
+                line.innerText = `[${ev.min}'] ${ev.text}`;
+                commentaryBox.appendChild(line);
+                commentaryBox.scrollTop = commentaryBox.scrollHeight;
 
-            activeMatchEventIdx++;
+                if (!activeMatchSimulation.wentToPenalties || ev.min < 120) {
+                    // Update score visually during regular/extra play
+                    let currScoreA = 0, currScoreB = 0;
+                    for (let i = 0; i <= activeMatchEventIdx; i++) {
+                        if (activeMatchEvents[i].type === 'goal') {
+                            if (activeMatchEvents[i].team === 'A') currScoreA++;
+                            if (activeMatchEvents[i].team === 'B') currScoreB++;
+                        }
+                    }
+                    document.getElementById('match-live-score').innerText = `${currScoreA} - ${currScoreB}`;
+                } else if (activeMatchSimulation.wentToPenalties) {
+                    document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB} (${activeMatchSimulation.penA}-${activeMatchSimulation.penB})`;
+                }
+
+                activeMatchEventIdx++;
+            }, 1200);
         }
 
         function skipMatchAnimation() {
             clearInterval(matchIntervalTimer);
-            let commBox = document.getElementById('match-commentary');
-            commBox.innerHTML = '';
-            activeMatchEvents.forEach(ev => {
-                let div = document.createElement('div');
-                div.className = `commentary-line ${ev.type}`;
-                div.innerText = `[Min ${ev.min}'] ${ev.text}`;
-                commBox.appendChild(div);
-            });
-            commBox.scrollTop = commBox.scrollHeight;
-
-            // Force end match scorelines update
-            let lastEv = activeMatchEvents[activeMatchEvents.length - 1];
-            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.res.scoreA} - ${activeMatchSimulation.res.scoreB}${activeMatchSimulation.res.penaltyText || ''}`;
+            let commentaryBox = document.getElementById('match-commentary');
             
-            document.getElementById('match-skip-btn').style.display = 'none';
-            document.getElementById('match-continue-btn').style.display = 'inline-block';
+            for (let i = activeMatchEventIdx; i < activeMatchEvents.length; i++) {
+                let ev = activeMatchEvents[i];
+                let line = document.createElement('div');
+                line.className = `commentary-line ${ev.type}`;
+                line.innerText = `[${ev.min}'] ${ev.text}`;
+                commentaryBox.appendChild(line);
+            }
+            commentaryBox.scrollTop = commentaryBox.scrollHeight;
+
+            if (activeMatchSimulation.wentToPenalties) {
+                document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB} (${activeMatchSimulation.penA}-${activeMatchSimulation.penB})`;
+            } else {
+                document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB}`;
+            }
+
+            document.getElementById('match-skip-btn').style.display = "none";
+            document.getElementById('match-continue-btn').style.display = "inline-block";
+        }
+
+        let savedDayResults = [];
+
+        function simulateOtherMatchesOnDay() {
+            savedDayResults = [];
+            let container = document.getElementById('simultaneous-match-results');
+            container.innerHTML = '';
+
+            if (currentStage === 'Group Stage') {
+                Object.keys(groups).sort().forEach(gName => {
+                    let pairings = groupRoundsSchedule[currentRound - 1];
+                    let teamList = groups[gName];
+                    pairings.forEach(pair => {
+                        let home = teamList[pair.t1];
+                        let away = teamList[pair.t2];
+                        
+                        if ((home === activeMatchSimulation.teamA && away === activeMatchSimulation.teamB) ||
+                            (away === activeMatchSimulation.teamA && home === activeMatchSimulation.teamB)) {
+                            // Already handled dynamically by active screen
+                            return;
+                        }
+
+                        let res = generateMatchEvents(home, away, false);
+                        savedDayResults.push({ stage: 'group', res: res });
+                        
+                        let div = document.createElement('div');
+                        div.style.padding = '5px 0';
+                        div.style.borderBottom = '1px solid #222';
+                        div.innerText = `${gName}: ${home} ${res.scoreA} - ${res.scoreB} ${away} (FT)`;
+                        container.appendChild(div);
+                    });
+                });
+            } else {
+                // Simulate all other simultaneous bracket fixtures in this specific phase round
+                knockoutMatches.forEach((match, idx) => {
+                    if ((match.teamA === activeMatchSimulation.teamA && match.teamB === activeMatchSimulation.teamB) ||
+                        (match.teamB === activeMatchSimulation.teamA && match.teamA === activeMatchSimulation.teamB)) {
+                        return;
+                    }
+                    if (match.played) return;
+
+                    let res = generateMatchEvents(match.teamA, match.teamB, true);
+                    savedDayResults.push({ stage: 'knockout', index: idx, res: res });
+
+                    let div = document.createElement('div');
+                    div.style.padding = '5px 0';
+                    div.style.borderBottom = '1px solid #222';
+                    let suffix = res.wentToPenalties ? `(PEN: ${res.penA}-${res.penB})` : (res.wentToET ? '(AET)' : '(FT)');
+                    div.innerText = `${knockoutRoundName}: ${match.teamA} ${res.scoreA} - ${res.scoreB} ${match.teamB} ${suffix}`;
+                    container.appendChild(div);
+                });
+            }
         }
 
         function finishMatchDay() {
+            // Apply stats from active live view match
+            applyMatchResultStats(activeMatchSimulation, currentStage === 'Knockout Stage');
+
+            // Apply stats from background background calculation jobs
+            savedDayResults.forEach(item => {
+                if (item.stage === 'group') {
+                    applyMatchResultStats(item.res, false);
+                } else {
+                    applyMatchResultStats(item.res, true);
+                    knockoutMatches[item.index].scoreA = item.res.scoreA;
+                    knockoutMatches[item.index].scoreB = item.res.scoreB;
+                    knockoutMatches[item.index].penA = item.res.penA;
+                    knockoutMatches[item.index].penB = item.res.penB;
+                    knockoutMatches[item.index].winner = item.res.winner;
+                    knockoutMatches[item.index].played = true;
+                }
+            });
+
+            // Advance Phase Steps
             if (currentStage === 'Group Stage') {
-                currentRound++;
-                if (currentRound > 3) {
-                    transitionToKnockoutStage();
+                if (currentRound < 3) {
+                    currentRound++;
+                    showScreen('screen-dashboard');
+                    refreshDashboard();
+                } else {
+                    currentStage = 'Knockout Stage';
+                    generateKnockoutBrackets();
                 }
             } else {
-                // Advance inside Knockout Bracket structures
-                let activeCount = knockoutMatches.filter(m => m.winner !== null).length;
-                if (knockoutRoundName === 'Final') {
-                    endTournamentGame();
-                    return;
-                }
-                
-                // Advance knockout tiers sequentially
-                if (knockoutRoundName === 'Round of 32') { knockoutRoundName = 'Round of 16'; knockoutMatches = generateNextKnockoutTier(knockoutMatches); }
-                else if (knockoutRoundName === 'Round of 16') { knockoutRoundName = 'Quarterfinals'; knockoutMatches = generateNextKnockoutTier(knockoutMatches); }
-                else if (knockoutRoundName === 'Quarterfinals') { knockoutRoundName = 'Semifinals'; knockoutMatches = generateNextKnockoutTier(knockoutMatches); }
-                else if (knockoutRoundName === 'Semifinals') { knockoutRoundName = 'Final'; knockoutMatches = generateNextKnockoutTier(knockoutMatches); }
+                // Check if user won or lost, check if tournament completely wrapped
+                processKnockoutRoundAdvancements();
             }
+        }
+
+        function applyMatchResultStats(res, isKnockout) {
+            if (!isKnockout) {
+                let tA = teams[res.teamA];
+                let tB = teams[res.teamB];
+
+                tA.gf += res.scoreA; tA.ga += res.scoreB; tA.gd = (tA.gf - tA.ga);
+                tB.gf += res.scoreB; tB.ga += res.scoreA; tB.gd = (tB.gf - tB.ga);
+
+                if (res.winner === res.teamA) { tA.won++; tA.points += 3; tB.lost++; }
+                else if (res.winner === res.teamB) { tB.won++; tB.points += 3; tA.lost++; }
+                else { tA.drawn++; tA.points += 1; tB.drawn++; tB.points += 1; }
+            } else {
+                let loser = (res.winner === res.teamA) ? res.teamB : res.teamA;
+                teams[loser].eliminated = true;
+                teams[loser].stageReached = knockoutRoundName;
+                
+                // Track main match array details
+                let match = knockoutMatches.find(m => (m.teamA === res.teamA && m.teamB === res.teamB) || (m.teamB === res.teamA && m.teamA === res.teamB));
+                if (match) {
+                    match.scoreA = res.scoreA; match.scoreB = res.scoreB;
+                    match.penA = res.penA; match.penB = res.penB;
+                    match.winner = res.winner; match.played = true;
+                }
+            }
+        }
+
+        function generateKnockoutBrackets() {
+            let advancedTeams = [];
+
+            // 1. Grab Top 2 auto qualifiers from all 12 groups
+            let thirdPlaceContenders = [];
+            Object.keys(groups).sort().forEach(gName => {
+                let sorted = getSortedGroupTeams(gName);
+                advancedTeams.push(sorted[0]);
+                advancedTeams.push(sorted[1]);
+                thirdPlaceContenders.push({ name: sorted[2], group: gName, pts: teams[sorted[2]].points, gd: teams[sorted[2]].gd, gf: teams[sorted[2]].gf });
+            });
+
+            // 2. Sort out best 8 third place teams to fill up the round of 32 slots (24 + 8 = 32)
+            thirdPlaceContenders.sort((a,b) => {
+                if(b.pts !== a.pts) return b.pts - a.pts;
+                if(b.gd !== a.gd) return b.gd - a.gd;
+                return b.gf - a.gf;
+            });
+
+            for(let i=0; i<8; i++) {
+                advancedTeams.push(thirdPlaceContenders[i].name);
+            }
+
+            // Flag eliminated tags for everyone else
+            Object.keys(teams).forEach(tName => {
+                if(!advancedTeams.includes(tName)) {
+                    teams[tName].eliminated = true;
+                    teams[tName].stageReached = 'Group Stage';
+                }
+            });
+
+            knockoutRoundName = 'Round of 32';
+            buildPairingsFromArray(advancedTeams);
+            
+            // Re-pick layout allocations for AI
+            advancedTeams.forEach(cName => { if(cName !== userTeam) autoPickStartingLineup(cName); });
 
             showScreen('screen-dashboard');
             refreshDashboard();
         }
 
-        function transitionToKnockoutStage() {
-            currentStage = 'Knockout Stage';
-            knockoutRoundName = 'Round of 32';
-            
-            let groupWinners = [];
-            let groupRunnersUp = [];
-            let thirdPlacePool = [];
-
-            for (let gName in groups) {
-                let sorted = getSortedGroupTeams(gName);
-                groupWinners.push(sorted[0]);
-                groupRunnersUp.push(sorted[1]);
-                thirdPlacePool.push(sorted[2]);
-
-                // Eliminate 4th place
-                teams[sorted[3]].eliminated = true;
-                teams[sorted[3]].stageReached = 'Group Stage (4th Place)';
-            }
-
-            // Sort 3rd place teams across all 12 groups to advance top 8
-            thirdPlacePool.sort((a,b) => {
-                let tA = teams[a];
-                let tB = teams[b];
-                if (tB.points !== tA.points) return tB.points - tA.points;
-                if (tB.gd !== tA.gd) return tB.gd - tA.gd;
-                if (tB.gf !== tA.gf) return tB.gf - tA.gf;
-                return a.localeCompare(b);
-            });
-
-            let advancingThirds = thirdPlacePool.slice(0, 8);
-            let eliminatedThirds = thirdPlacePool.slice(8);
-            eliminatedThirds.forEach(tName => {
-                teams[tName].eliminated = true;
-                teams[tName].stageReached = 'Group Stage (3rd Place - Eliminated)';
-            });
-
-            // Combine advancing pool into 32 single elimination entries
+        function buildPairingsFromArray(teamList) {
             knockoutMatches = [];
-            // Match 1-8: First 8 Group Winners vs inverted top 8 3rd places
-            for (let i = 0; i < 8; i++) {
-                knockoutMatches.push({ teamA: groupWinners[i], teamB: advancingThirds[7 - i], scoreA: null, scoreB: null, winner: null, penaltyText: "" });
-            }
-            // Match 9-12: Remaining 4 group winners vs first 4 runners up
-            for (let i = 0; i < 4; i++) {
-                knockoutMatches.push({ teamA: groupWinners[8 + i], teamB: groupRunnersUp[i], scoreA: null, scoreB: null, winner: null, penaltyText: "" });
-            }
-            // Match 13-16: Remaining 8 runners-up play each other
-            for (let i = 0; i < 4; i++) {
-                knockoutMatches.push({ teamA: groupRunnersUp[4 + i], teamB: groupRunnersUp[11 - i], scoreA: null, scoreB: null, winner: null, penaltyText: "" });
-            }
-
-            alert("Group Stage Concluded! 24 top teams + 8 best 3rd-place teams have advanced to the Round of 32.");
-        }
-
-        function generateNextKnockoutTier(prevMatches) {
-            let nextTier = [];
-            for (let i = 0; i < prevMatches.length; i += 2) {
-                nextTier.push({
-                    teamA: prevMatches[i].winner,
-                    teamB: prevMatches[i+1].winner,
-                    scoreA: null, scoreB: null, winner: null, penaltyText: ""
+            currentKnockoutIndex = 0;
+            // standard seeded structural setup loop
+            for(let i=0; i < teamList.length / 2; i++) {
+                knockoutMatches.push({
+                    teamA: teamList[i],
+                    teamB: teamList[teamList.length - 1 - i],
+                    played: false, winner: null, scoreA: 0, scoreB: 0, penA:0, penB:0
                 });
             }
-            return nextTier;
         }
 
-        function endTournamentGame() {
-            showScreen('screen-over');
-            let champion = knockoutMatches[0].winner;
-            document.getElementById('tournament-end-summary').innerHTML = `🎉 <strong>${champion}</strong> are the World Cup 2026 Champions!`;
+        function processKnockoutRoundAdvancements() {
+            let incomplete = knockoutMatches.some(m => !m.played);
+            if (incomplete) {
+                // Should simulate remaining items silently or return to handle sequentially
+                knockoutMatches.forEach((m, idx) => {
+                    if (!m.played) {
+                        let res = generateMatchEvents(m.teamA, m.teamB, true);
+                        applyMatchResultStats(res, true);
+                    }
+                });
+            }
+
+            let survivors = knockoutMatches.map(m => m.winner);
+
+            if (survivors.length === 1) {
+                // Final match completed!
+                endTournament(survivors[0]);
+                return;
+            }
+
+            // Advance phase labels
+            if (survivors.length === 16) knockoutRoundName = 'Round of 16';
+            else if (survivors.length === 8) knockoutRoundName = 'Quarterfinals';
+            else if (survivors.length === 4) knockoutRoundName = 'Semifinals';
+            else if (survivors.length === 2) knockoutRoundName = 'Final';
+
+            buildPairingsFromArray(survivors);
             
-            let uStats = teams[userTeam];
-            document.getElementById('manager-performance-stats').innerHTML = `
-                • Managed Country: <strong>${userTeam}</strong><br>
-                • Stage Reached: <strong style="color:var(--gold);">${uStats.stageReached === 'Final' && knockoutMatches[0].winner === userTeam ? '🏆 Champions!' : uStats.stageReached}</strong><br>
-                • Group Stage Performance: ${uStats.won} W / ${uStats.drawn} D / ${uStats.lost} L<br>
-                • Total Goals For: ${uStats.gf}<br>
-                • Total Goals Against: ${uStats.ga}
+            // Re-calculate setup models for remaining AI survivors
+            survivors.forEach(cName => { if(cName !== userTeam) autoPickStartingLineup(cName); });
+
+            showScreen('screen-dashboard');
+            refreshDashboard();
+        }
+
+        function endTournament(championName) {
+            showScreen('screen-over');
+            let summary = document.getElementById('tournament-end-summary');
+            let stats = document.getElementById('manager-performance-stats');
+
+            if (championName === userTeam) {
+                summary.innerHTML = `🎉 CONGRATULATIONS! You managed <strong>${userTeam}</strong> to absolute victory. You are World Champions! 🏆`;
+            } else {
+                summary.innerHTML = `The tournament has ended. <strong>${championName}</strong> have won the 2026 World Cup trophy!`;
+            }
+
+            let u = teams[userTeam];
+            stats.innerHTML = `
+                • <strong>Team Managed:</strong> ${userTeam}<br>
+                • <strong>Stage Reached:</strong> ${u.eliminated ? u.stageReached : '🏆 Champions!'}<br>
+                • <strong>Group Record:</strong> ${u.won} W / ${u.drawn} D / ${u.lost} L<br>
+                • <strong>Goals Scored:</strong> ${u.gf}<br>
+                • <strong>Goals Conceded:</strong> ${u.ga}
             `;
         }
     </script>
