@@ -41,9 +41,9 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 20px auto;
-            padding: 0 15px;
+            padding: 0 20px;
         }
 
         .screen {
@@ -54,228 +54,349 @@
             display: block;
         }
 
-        button {
-            background-color: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            cursor: pointer;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: background-color 0.2s;
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        button:hover {
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .btn:hover {
             background-color: var(--accent-hover);
         }
 
-        button:disabled {
-            background-color: #444;
+        .btn:disabled {
+            background-color: #555;
             color: #888;
             cursor: not-allowed;
         }
 
-        /* Forms & Grid layouts */
-        .grid-32 {
+        .upload-box {
+            text-align: center;
+            padding: 40px;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .group-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
             margin-top: 20px;
         }
 
-        .team-card {
+        .group-card {
             background-color: var(--card-bg);
-            padding: 15px;
+            border: 1px solid #333;
             border-radius: 6px;
-            text-align: center;
+            padding: 15px;
+        }
+
+        .group-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--gold);
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .team-select-btn {
+            display: block;
+            width: 100%;
+            background: #2a2a2a;
+            color: var(--text-color);
+            border: 1px solid #444;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            text-align: left;
             cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: background 0.2s;
         }
 
-        .team-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent-color);
+        .team-select-btn:hover {
+            background: var(--accent-color);
+            color: white;
         }
 
-        /* Dashboard layout */
-        .dash-layout {
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        @media(max-width: 768px) {
-            .dash-layout {
+        @media (max-width: 900px) {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        .box {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        /* Tabs layout styling */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
         }
 
-        .box h2 {
-            margin-top: 0;
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px;
+        .tab-btn {
+            background: #222;
+            color: #ccc;
+            border: 1px solid #444;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color);
             color: #fff;
+            border-color: var(--accent-hover);
         }
 
-        /* Tables */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .pos-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            margin-right: 8px;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        .pos-GK { background-color: var(--gk-color); }
+        .pos-DF { background-color: var(--df-color); }
+        .pos-MF { background-color: var(--mf-color); }
+        .pos-FW { background-color: var(--fw-color); }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .player-row.disabled {
+            opacity: 0.4;
+        }
+
+        .squad-scroll {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            font-size: 0.9rem;
         }
 
         th, td {
-            padding: 8px;
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #333;
         }
 
         th {
-            background-color: #151515;
-            color: var(--text-muted);
+            background-color: #1a1a1a;
+            color: var(--gold);
         }
 
-        .group-grid {
+        .advance-zone { background-color: rgba(46, 125, 50, 0.15); }
+        .best-third-zone { background-color: rgba(251, 192, 45, 0.1); }
+
+        .rating-box {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            margin: 15px 0;
         }
 
-        .group-box {
-            background: #1a1a1a;
+        .rating-card {
+            background: #252525;
             padding: 10px;
             border-radius: 6px;
-            border: 1px solid #2a2a2a;
+            border-bottom: 3px solid #444;
         }
 
-        .group-box h3 {
-            margin: 5px 0;
-            color: var(--gold);
-            font-size: 1.1rem;
+        .formation-select {
+            background: #2a2a2a;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+            cursor: pointer;
         }
 
-        /* Lineup Manager Tables */
-        .player-row td {
-            padding: 6px 8px;
-        }
-        .pos-gk { color: var(--gk-color); font-weight: bold; }
-        .pos-df { color: var(--df-color); font-weight: bold; }
-        .pos-mf { color: var(--mf-color); font-weight: bold; }
-        .pos-fw { color: var(--fw-color); font-weight: bold; }
-
-        /* Match Simulation Screen Layout */
-        .match-arena {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            background-color: #1a1a1a;
-            padding: 20px;
+        /* Interactive Simulator Layout */
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: #0a0a0a;
+            padding: 15px;
             border-radius: 8px;
         }
 
-        @media(max-width: 768px){
-            .match-arena { grid-template-columns: 1fr; }
+        .match-team { width: 38%; }
+        .match-score { font-size: 2.5rem; color: var(--gold); width: 24%; text-align: center; }
+        
+        .live-power-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
         }
-
-        .match-header {
-            grid-column: 1 / -1;
-            text-align: center;
-            background: #111;
-            padding: 15px;
+        .live-power-col {
+            background: #1a1a1a;
+            padding: 10px;
             border-radius: 6px;
-        }
-
-        .score-display {
-            font-size: 3rem;
-            font-weight: bold;
-            letter-spacing: 5px;
-            margin: 10px 0;
-        }
-
-        .match-timer {
-            font-size: 1.5rem;
-            color: var(--gold);
-            font-weight: bold;
-        }
-
-        .scorers-list {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-top: 8px;
-            line-height: 1.4;
+            font-size: 0.85rem;
         }
 
         .commentary-box {
-            background: #090909;
+            background: #050505;
+            border-radius: 6px;
             height: 300px;
             overflow-y: auto;
             padding: 15px;
             font-family: 'Courier New', Courier, monospace;
-            border-radius: 6px;
             border: 1px solid #222;
+            margin: 15px 0;
         }
 
         .commentary-line {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             line-height: 1.4;
             border-left: 3px solid #444;
             padding-left: 8px;
         }
+        .commentary-line.goal { color: #4caf50; font-weight: bold; border-left-color: #4caf50; }
+        .commentary-line.info { color: var(--gold); border-left-color: var(--gold); }
+        .commentary-line.redcard { color: #ff1744; font-weight: bold; border-left-color: #ff1744; }
+        .commentary-line.home-team { color: #42a5f5; border-left-color: #42a5f5; }
+        .commentary-line.away-team { color: #ab47bc; border-left-color: #ab47bc; }
 
-        .team-a-goal {
-            color: #4caf50;
+        .side-results { max-height: 180px; overflow-y: auto; font-size: 0.85rem; }
+
+        /* Scrollable Tree View Bracket */
+        .bracket-scroll-container {
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+        .bracket-wrapper {
+            display: flex;
+            gap: 40px;
+            width: max-content;
+        }
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 200px;
+        }
+        .bracket-match-node {
+            background: #252525;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 0.8rem;
+        }
+        .bracket-match-node div {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+        .bracket-winner {
+            color: var(--gold);
             font-weight: bold;
-            border-left-color: #4caf50;
         }
 
-        .team-b-goal {
-            color: #ff9800;
-            font-weight: bold;
-            border-left-color: #ff9800;
-        }
-
-        .match-stats-table th, .match-stats-table td {
-            text-align: center;
-        }
-
-        .subs-overlay {
+        /* Overlay Styles for Live Substitutions */
+        .modal-overlay {
+            display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
-        .subs-modal {
-            background: var(--card-bg);
-            padding: 20px;
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: #1e1e1e;
             border-radius: 8px;
             width: 90%;
             max-width: 600px;
+            padding: 20px;
             max-height: 85vh;
             overflow-y: auto;
+            border: 2px solid var(--accent-color);
         }
-
-        .eliminated-selector {
-            background: #2a1a1a;
-            border: 1px solid #d32f2f;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        .sub-flex {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 15px;
         }
-        .eliminated-selector h3 {
-            margin-top: 0;
-            color: #ff8a80;
+        .sub-box {
+            width: 100%;
+            background: #111;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        .sub-item-btn {
+            width: 100%;
+            background: #252525;
+            color: white;
+            border: 1px solid #333;
+            padding: 6px;
+            margin: 4px 0;
+            text-align: left;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -283,334 +404,359 @@
 
     <header>
         <h1>🏆 World Cup 2026 Manager Pro</h1>
+        <div id="sub-header" style="color: var(--text-muted); margin-top: 5px;">Upload squad data to start your journey</div>
     </header>
 
     <div class="container">
 
-        <div id="screen-select-team" class="screen active">
-            <div class="box">
-                <h2>Select Your National Team</h2>
-                <p>Choose one of the 32 participating nations to guide through the tournament group stage and knockouts.</p>
-                <div id="team-selection-grid" class="grid-32"></div>
+        <div id="screen-upload" class="screen active">
+            <div class="card" style="text-align: center;">
+                <h2>Welcome Manager!</h2>
+                <p>Load your World Cup squad CSV dataset containing Group, Country, Full Name, Club, Position, Ability ratings.</p>
+                <div class="upload-box" onclick="document.getElementById('csvFileInput').click()">
+                    <span style="font-size: 3rem;">📁</span>
+                    <p>Click here to select and upload your 2026 World Cup Squads CSV</p>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-choose-team" class="screen">
+            <div class="card">
+                <h2>Select Your Country to Manage</h2>
+                <p>Choose any nation from the tournament groups to take control of tactical setups, fatigue management, and substitutions.</p>
+                <div id="group-selection-grid" class="group-grid"></div>
             </div>
         </div>
 
         <div id="screen-dashboard" class="screen">
-            <div class="dash-layout">
-                
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
-                    <div class="box">
-                        <h2 id="dash-stage-title">Group Stage - Matchday 1</h2>
-                        <div style="display: flex; align-items: center; justify-content: space-between; background: #151515; padding: 20px; border-radius: 6px;">
-                            <div style="text-align: center; flex: 1;">
-                                <h3 id="dash-home-team" style="font-size: 1.4rem; margin: 5px 0;">Home</h3>
-                            </div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--gold); padding: 0 20px;">VS</div>
-                            <div style="text-align: center; flex: 1;">
-                                <h3 id="dash-away-team" style="font-size: 1.4rem; margin: 5px 0;">Away</h3>
-                            </div>
+                    <h2 id="dash-team-name" style="margin: 0; color: #fff;">Team Name</h2>
+                    <div id="dash-stage-info" style="color: var(--gold); font-weight: bold; margin-top: 5px;">Group Stage</div>
+                </div>
+                <div id="next-match-summary" style="background: #2a2a2a; padding: 10px 20px; border-radius: 6px; text-align: right;">
+                    <strong>Next Match:</strong> <span id="next-opponent">Loading...</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">🛠️ Squad & Rotation Setup</h3>
+                        <select id="user-formation-select" class="formation-select" onchange="changeUserFormation()">
+                            <option value="4-4-2">4-4-2</option>
+                            <option value="4-3-3">4-3-3</option>
+                            <option value="3-5-2">3-5-2</option>
+                            <option value="5-3-2">5-3-2</option>
+                        </select>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+                        Pick exactly 1 GK and 10 outfielders. Tired players suffer minor ability drops. Suspended players cannot perform.
+                    </p>
+                    
+                    <div class="rating-box">
+                        <div class="rating-card" style="border-bottom-color: var(--gk-color)">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">GK BASE</div>
+                            <div id="power-gk" style="font-size: 1.3rem; font-weight: bold;">0</div>
                         </div>
-                        <div style="margin-top: 15px; text-align: right;">
-                            <button id="btn-play-match" onclick="startMatchSimulation()">Simulate Match</button>
+                        <div class="rating-card" style="border-bottom-color: var(--df-color)">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">DEFENSE</div>
+                            <div id="power-df" style="font-size: 1.3rem; font-weight: bold;">0</div>
+                        </div>
+                        <div class="rating-card" style="border-bottom-color: var(--mf-color)">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">MIDFIELD</div>
+                            <div id="power-mf" style="font-size: 1.3rem; font-weight: bold;">0</div>
+                        </div>
+                        <div class="rating-card" style="border-bottom-color: var(--fw-color)">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">ATTACK</div>
+                            <div id="power-fw" style="font-size: 1.3rem; font-weight: bold;">0</div>
                         </div>
                     </div>
 
-                    <div id="box-eliminated-selector" class="box eliminated-selector" style="display: none;">
-                        <h3>Neutral View Mode</h3>
-                        <p>Your team has been eliminated. Select which upcoming match in this round you would like to watch live:</p>
-                        <div id="eliminated-match-buttons" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                    <div style="background: #111; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+                        <span id="formation-readout" style="font-weight: bold; color: var(--gold);">Formation Layout: 0-0-0</span>
+                        <span id="selection-count">Selected: 0 / 11</span>
                     </div>
 
-                    <div class="box" id="box-lineup-management">
-                        <h2>Manage Squad & Lineup (<span id="dash-team-name">Your Team</span>)</h2>
-                        <p style="font-size: 0.9rem; color: var(--text-muted);">Select exactly 11 starting players. Unchecked players will stay on the bench.</p>
-                        <div id="lineup-validation-msg" style="color: #ff8a80; font-weight: bold; margin-bottom: 10px;"></div>
-                        <table>
-                            <thead>
-                                border-bottom
-                                <tr>
-                                    <th style="width: 40px;">Start</th>
-                                    <th>Player Name</th>
-                                    <th>Pos</th>
-                                    <th>OVR</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="squad-table-body"></tbody>
-                        </table>
-                    </div>
+                    <div class="squad-scroll" id="squad-players-list"></div>
                 </div>
 
                 <div>
-                    <div class="box">
-                        <h2>Tournament Standings</h2>
-                        <div id="group-stage-container" class="group-grid"></div>
+                    <div class="card">
+                        <div class="tab-navigation">
+                            <button class="tab-btn active" onclick="switchDashboardTab('tab-standings', this)">📊 Tables</button>
+                            <button class="tab-btn" onclick="switchDashboardTab('tab-leaderboards', this)">📈 Stats Charts</button>
+                            <button class="tab-btn" onclick="switchDashboardTab('tab-bracket', this)">🌳 Knockout Tree</button>
+                        </div>
+
+                        <div id="tab-standings" class="tab-content active">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="margin: 0;">Group Standings</h4>
+                                <select id="group-view-select" style="background: #2a2a2a; color: white; padding: 5px; border-radius: 4px; border: 1px solid #444;" onchange="renderStandingsTable()"></select>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Pos</th>
+                                            <th>Team</th>
+                                            <th>P</th>
+                                            <th>W</th>
+                                            <th>D</th>
+                                            <th>L</th>
+                                            <th>GD</th>
+                                            <th>Pts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="standings-table-body"></tbody>
+                                </table>
+                            </div>
+                            <div id="standings-legend-note" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+                                <span style="display:inline-block; width:10px; height:10px; background:rgba(46,125,50,0.25); margin-right:4px; vertical-align:middle;"></span> Top 2 Auto-Advance 
+                                <span style="display:inline-block; width:10px; height:10px; background:rgba(251,192,45,0.15); margin-right:4px; margin-left:10px; vertical-align:middle;"></span> Best 3rd-Place Candidates
+                            </div>
+                        </div>
+
+                        <div id="tab-leaderboards" class="tab-content">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <h4 style="color: var(--fw-color); margin: 5px 0;">⚽ Top Scorers</h4>
+                                    <div style="max-height: 200px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
+                                        <table style="margin:0;"><tbody id="leaderboard-goals"></tbody></table>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 style="color: var(--mf-color); margin: 5px 0;">🎯 Top Assists</h4>
+                                    <div style="max-height: 200px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
+                                        <table style="margin:0;"><tbody id="leaderboard-assists"></tbody></table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <h4 style="color: var(--gk-color); margin: 5px 0;">🧤 Goalkeeper Clean Sheets</h4>
+                                <div style="max-height: 150px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
+                                    <table style="margin:0;"><tbody id="leaderboard-cleansheets"></tbody></table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-bracket" class="tab-content">
+                            <h4>Tournament Bracket Tree</h4>
+                            <p style="font-size:0.75rem; color:var(--text-muted);">Scroll horizontally to view matchups tracking across knockout rounds.</p>
+                            <div class="bracket-scroll-container">
+                                <div class="bracket-wrapper" id="bracket-tree-root">
+                                    <div style="color:var(--text-muted); font-size:0.85rem; padding:20px;">Knockout tree is drafted once the Group Stage concludes.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="text-align: center;">
+                        <h3>Match Preparation</h3>
+                        <div id="spectator-match-picker-container" style="display:none; margin-bottom:15px; background:#111; padding:10px; border-radius:6px;">
+                            <label style="display:block; margin-bottom:5px; font-size:0.85rem; font-weight:bold; color:var(--gold);">Choose match to spectate live:</label>
+                            <select id="spectator-match-dropdown" style="background:#2a2a2a; color:white; padding:8px; border-radius:4px; border:1px solid #444; width:100%; font-size:0.85rem;"></select>
+                        </div>
+                        <div id="validation-error-msg" style="color: var(--fw-color); margin-bottom: 15px; font-weight: bold; font-size:0.9rem;">Lineup loading...</div>
+                        <button class="btn" id="play-match-btn" disabled onclick="startMatchSimulation()">Enter Match Field</button>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <div id="screen-match-sim" class="screen">
-            <div class="match-arena">
+        <div id="screen-match" class="screen">
+            <div class="card">
                 <div class="match-header">
-                    <div id="match-stage-label" style="text-transform: uppercase; font-size: 0.85rem; color: var(--text-muted); letter-spacing: 2px;">Group Stage</div>
-                    <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
-                        <span id="sim-team-a" style="font-size: 1.6rem; font-weight: bold;">Team A</span>
-                        <div class="score-display"><span id="sim-score-a">0</span> - <span id="sim-score-b">0</span></div>
-                        <span id="sim-team-b" style="font-size: 1.6rem; font-weight: bold;">Team B</span>
+                    <div class="match-team" id="match-teamA-name" style="color: #42a5f5;">Team A</div>
+                    <div class="match-score" id="match-live-score">0 - 0</div>
+                    <div class="match-team" id="match-teamB-name" style="color: #ab47bc;">Team B</div>
+                </div>
+                <div id="match-clock" style="text-align:center; font-size:1.5rem; font-weight:bold; margin-top:5px; color:var(--gold);">00:00</div>
+
+                <div class="live-power-container">
+                    <div class="live-power-col" id="live-power-home-box">
+                        <strong id="live-label-home">Home Power Ratings</strong>
+                        <div id="live-power-home-text" style="margin-top:5px; line-height:1.4;"></div>
                     </div>
-                    <div class="match-timer"><span id="sim-time">0</span>'</div>
-                    <div id="sim-scorers" class="scorers-list"></div>
-                    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
-                        <button id="btn-match-subs" onclick="openInGameSubs()">🔄 Substitutions / Tactics</button>
-                        <button id="btn-match-half" onclick="resumeSecondHalf()" style="display: none; background-color: var(--gold); color: #000;">▶️ Start Second Half</button>
+                    <div class="live-power-col" id="live-power-away-box">
+                        <strong id="live-label-away">Away Power Ratings</strong>
+                        <div id="live-power-away-text" style="margin-top:5px; line-height:1.4;"></div>
                     </div>
                 </div>
 
-                <div>
-                    <h3 style="margin-top: 0; color: #fff;">Live Commentary</h3>
-                    <div id="commentary-feed" class="commentary-box"></div>
+                <div id="match-user-stats-bar" style="margin: 10px 0; text-align: center; display: flex; justify-content: center; gap: 20px; font-size: 0.85rem;">
+                    <div><strong>Your Subscriptions Used:</strong> <span id="user-subs-count">0 / 5</span></div>
                 </div>
 
-                <div>
-                    <h3 style="margin-top: 0; color: #fff;">Match Statistics</h3>
-                    <table class="match-stats-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 35%;" id="stat-lbl-team-a">Team A</th>
-                                <th style="width: 30%;">Stat</th>
-                                <th style="width: 35%;" id="stat-lbl-team-b">Team B</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="stat-shots-a">0</td>
-                                <td>Shots</td>
-                                <td id="stat-shots-b">0</td>
-                            </tr>
-                            <tr>
-                                <td id="stat-fouls-a">0</td>
-                                <td>Fouls</td>
-                                <td id="stat-fouls-b">0</td>
-                            </tr>
-                            <tr>
-                                <td id="stat-yellow-a">0</td>
-                                <td>Yellow Cards</td>
-                                <td id="stat-yellow-b">0</td>
-                            </tr>
-                            <tr>
-                                <td id="stat-red-a">0</td>
-                                <td>Red Cards</td>
-                                <td id="stat-red-b">0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 30px; text-align: right;">
-                        <button id="btn-finish-match" onclick="finishMatchSimulation()" disabled>Simulating Match...</button>
-                    </div>
+                <div style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn" id="match-pause-btn" style="background:#d32f2f;" onclick="triggerTacticalPause()">⏸️ Tactical Pause & Subs</button>
+                    <button class="btn" id="match-resume-btn" style="background:#2e7d32; display:none;" onclick="resumeTacticalSimulation()">▶️ Resume Match</button>
                 </div>
-            </div>
-        </div>
 
-        <div id="subs-overlay-modal" class="subs-overlay" style="display: none;">
-            <div class="subs-modal">
-                <h2 style="margin-top: 0;">In-Game Substitutions</h2>
-                <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    Manage your 11 starting players. Total substitutions made: <span id="modal-sub-count-text">0</span>/5.<br>
-                    Checked players are on the field. Unchecking a player subs them off. Players subbed off or sent off cannot re-enter.
-                </p>
-                <div id="modal-subs-validation-msg" style="color: #ff8a80; font-weight: bold; margin-bottom: 10px;"></div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">On Pitch</th>
-                            <th>Player Name</th>
-                            <th>Pos</th>
-                            <th>OVR</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="modal-subs-table-body"></tbody>
-                </table>
-                <div style="margin-top: 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-                    <button onclick="saveInGameSubs()">Apply Modifications</button>
-                    <button style="background: #555;" onclick="closeInGameSubs()">Cancel</button>
+                <div class="commentary-box" id="match-commentary"></div>
+
+                <div style="text-align: center; margin-bottom: 15px; display:flex; justify-content:center; gap:10px;">
+                    <button class="btn" id="match-skip-btn" onclick="skipMatchAnimation()">⚡ Instant Results</button>
+                    <button class="btn" id="match-continue-btn" style="display:none;" onclick="finishMatchDay()">Return to Dashboard</button>
+                </div>
+
+                <div class="card" style="background: #151515; margin-top:15px;">
+                    <h4>📋 Concurrent Match Scores</h4>
+                    <div class="side-results" id="simultaneous-match-results"></div>
                 </div>
             </div>
         </div>
 
         <div id="screen-over" class="screen">
-            <div class="box" style="text-align: center; padding: 40px 20px;">
-                <h2 style="font-size: 2.5rem; color: var(--gold);">Tournament Concluded</h2>
-                <p id="tournament-end-summary" style="font-size: 1.3rem; margin: 20px 0;"></p>
-                <div id="manager-performance-stats" style="background: #151515; text-align: left; max-width: 450px; margin: 20px auto; padding: 20px; border-radius: 6px; line-height: 1.8;"></div>
-                <button onclick="window.location.reload()" style="margin-top: 20px; font-size: 1.2rem; padding: 12px 30px;">Play Again</button>
+            <div class="card" style="text-align: center; padding: 40px;">
+                <h1 style="font-size: 3rem; color: var(--gold); margin: 0;">🏆 Tournament Wrapped!</h1>
+                <p id="tournament-end-summary" style="font-size: 1.2rem; margin: 20px 0;"></p>
+                <div class="card" style="background:#1a1a1a; max-width: 500px; margin: 0 auto 30px auto; text-align: left;">
+                    <h3>Manager Career Performance</h3>
+                    <p id="manager-performance-stats"></p>
+                </div>
+                <button class="btn" onclick="location.reload()">Reset & Restart Simulation</button>
             </div>
         </div>
 
     </div>
 
+    <div id="sub-modal-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <h3 style="margin-top:0; color:var(--gold);">🔄 Live Squad Substitutions</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">
+                Toggle active players off and on. Max 5 total times a player can be "subbed on". Note: Subbed-off or red-carded players cannot return.
+            </p>
+            
+            <div class="sub-flex">
+                <div class="sub-box">
+                    <strong style="color:var(--gold); font-size:0.9rem; display:block; margin-bottom:10px;">Select Exactly 11 Active Players</strong>
+                    <div id="modal-combined-roster-list"></div>
+                </div>
+            </div>
+
+            <div style="text-align:right; margin-top:20px; display:flex; justify-content:space-between; align-items:center;">
+                <span id="modal-sub-error" style="color:var(--fw-color); font-weight:bold; font-size:0.85rem;"></span>
+                <div>
+                    <button class="btn" style="background:#555; padding:8px 16px; font-size:0.85rem; margin-right:10px;" onclick="closeSubModal()">Cancel</button>
+                    <button class="btn" style="padding:8px 16px; font-size:0.85rem;" onclick="confirmManagerSubstitution()">Apply Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // GLOBAL STATE DATA
-        const teamNames = [
-            "Argentina", "Australia", "Belgium", "Brazil", "Cameroon", "Canada", "Chile", "Colombia",
-            "Croatia", "Denmark", "Ecuador", "Egypt", "England", "France", "Germany", "Ghana",
-            "Iran", "Japan", "Mexico", "Morocco", "Netherlands", "Nigeria", "Peru", "Portugal",
-            "Saudi Arabia", "Senegal", "South Korea", "Spain", "Switzerland", "Tunisia", "Turkey", "USA"
-        ];
-
-        const firstNames = ["James", "Lucas", "Mateo", "Liam", "Noah", "Oliver", "Amir", "Youssef", "Diego", "Gabriel", "Thomas", "Antoine", "Harry", "Mason", "Kai", "Jonas", "Luka", "Ivan", "Kenji", "Hiro", "Min-jae", "Son", "Santiago", "Enzo", "Alphonso", "Jonathan", "Sadio", "Idrissa", "Hakan", "Burak", "Christian", "Weston"];
-        const lastNames = ["Smith", "Garcia", "Martinez", "Rodriguez", "Müller", "Schmidt", "Dubois", "Lefebvre", "Silva", "Santos", "Jones", "Williams", "Brown", "Davis", "van Dijk", "de Jong", "Modric", "Kovacic", "Tanaka", "Sato", "Kim", "Lee", "Salah", "Elneny", "Mane", "Koulibaly", "Yilmaz", "Calhanoglu", "Pulisic", "McKennie", "Messi", "Ronaldo"];
-        const positionsPool = ["GK", "DF", "DF", "DF", "DF", "MF", "MF", "MF", "MF", "FW", "FW"];
-
+        // Global State Core Arrays
+        let playersRaw = [];
         let teams = {};
         let groups = {};
-        const groupLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        let userTeam = null;
         
-        let userTeam = "";
-        let currentStage = "group"; // "group", "R32", "R16", "QF", "SF", "Final"
-        let currentGroupMatchday = 1; 
-        let groupFixtures = []; 
-        let knockoutMatches = []; 
-        let activeMatchIdx = 0; 
-        
-        // Match Simulation Engine Variables
-        let simInterval = null;
-        let simTime = 0;
-        let teamAData = null;
-        let teamBData = null;
-        let matchScoreA = 0;
-        let matchScoreB = 0;
-        let matchScorers = []; // tracks structured records {name, min, teamLabel: 'A'|'B'}
-        let matchStats = {};
-        let chosenNeutralMatchIdx = null; // tracking user choice if eliminated
-        let isHalfTimePaused = false;
+        let currentStage = 'Group Stage';
+        let currentRound = 1;
+        let knockoutRoundName = 'Round of 32';
+        let knockoutMatches = [];
+        let knockoutHistoryTree = {}; // Structure logging for brackets layout mapping
+        let currentKnockoutIndex = 0;
 
-        // INITIALIZE SIMULATION ENGINE ON LOAD
-        window.onload = function() {
-            generateAllTeamsAndPlayers();
-            generateGroups();
-            generateGroupFixtures();
-            renderTeamSelectionGrid();
-            renderGroupTables();
+        // Match Engine Engine Globals
+        let activeMatchSimulation = null;
+        let matchIntervalTimer = null;
+        let simMinute = 0;
+        let isSimPaused = false;
+        let savedDayResults = [];
+
+        // Rules Constraints Constants
+        const MaxUserSubs = 5;
+
+        const FORMATIONS = {
+            "4-4-2": { DF: 4, MF: 4, FW: 2 },
+            "4-3-3": { DF: 4, MF: 3, FW: 3 },
+            "3-5-2": { DF: 3, MF: 5, FW: 2 },
+            "5-3-2": { DF: 5, MF: 3, FW: 2 }
         };
 
-        function generateAllTeamsAndPlayers() {
-            teamNames.forEach(tName => {
-                let playerList = [];
-                // Generate standard set of 18 squad players
-                for(let i=0; i<18; i++) {
-                    let f = firstNames[Math.floor(Math.random() * firstNames.length)];
-                    let l = lastNames[Math.floor(Math.random() * lastNames.length)];
-                    let pos = (i < 2) ? "GK" : (i < 8) ? "DF" : (i < 14) ? "MF" : "FW";
-                    let ovr = Math.floor(Math.random() * 21) + 70; // ratings 70-90
-                    playerList.push({
-                        name: `${f} ${l}`,
-                        position: pos,
-                        overall: ovr,
-                        isStarting: false,
-                        redCard: false,
-                        yellowCards: 0,
-                        subbedOff: false,
-                        subbedOnCount: 0
-                    });
-                }
-                teams[tName] = {
-                    name: tName,
-                    players: playerList,
-                    points: 0, mp: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0,
-                    eliminated: false,
-                    stageReached: "Group Stage",
-                    totalSubsThisMatch: 0
+        const groupRoundsSchedule = [
+            [ {t1: 0, t2: 1}, {t1: 2, t2: 3} ],
+            [ {t1: 0, t2: 2}, {t1: 1, t2: 3} ],
+            [ {t1: 0, t2: 3}, {t1: 1, t2: 2} ]
+        ];
+
+        // Setup CSV loading pipelines
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(evt) {
+                parseSquadCSV(evt.target.result);
+            };
+            reader.readAsText(file);
+        });
+
+        function parseSquadCSV(text) {
+            let lines = text.split(/\r?\n/);
+            if(lines.length === 0) return alert('Empty CSV file.');
+            
+            let headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            let gIdx = headers.indexOf('Group');
+            let cIdx = headers.indexOf('Country');
+            let nIdx = headers.indexOf('Full Name');
+            let clIdx = headers.indexOf('Club');
+            let pIdx = headers.indexOf('Position');
+            let aIdx = headers.indexOf('Ability');
+
+            if (gIdx === -1 || cIdx === -1 || nIdx === -1 || pIdx === -1 || aIdx === -1) {
+                return alert('CSV structure invalid. Required headers: Group, Country, Full Name, Club, Position, Ability');
+            }
+
+            playersRaw = [];
+            teams = {};
+            groups = {};
+
+            for (let i = 1; i < lines.length; i++) {
+                let line = lines[i].trim();
+                if (!line) continue;
+                let parts = line.split(',').map(p => p.trim().replace(/^"|"$/g, ''));
+                if (parts.length < headers.length) continue;
+
+                let player = {
+                    Group: parts[gIdx],
+                    Country: parts[cIdx],
+                    FullName: parts[nIdx],
+                    Club: parts[clIdx] || 'Unknown',
+                    Position: parts[pIdx],
+                    BaseAbility: parseInt(parts[aIdx] || '70', 10),
+                    Fatigue: 0, 
+                    Suspended: false,
+                    Goals: 0,
+                    Assists: 0,
+                    CleanSheets: 0,
+                    // Track custom variables for substitution limitations
+                    subOnCount: 0,
+                    subbedOff: false
                 };
-                autoPickStartingLineup(tName);
-            });
-        }
+                playersRaw.push(player);
 
-        function autoPickStartingLineup(tName) {
-            let t = teams[tName];
-            t.players.forEach(p => { 
-                p.isStarting = false; 
-                p.redCard = false; 
-                p.yellowCards = 0;
-                p.subbedOff = false;
-                p.subbedOnCount = 0;
-            });
-            t.totalSubsThisMatch = 0;
-
-            let counts = { GK: 1, DF: 4, MF: 4, FW: 2 };
-            let sorted = [...t.players].sort((a,b) => b.overall - a.overall);
-
-            sorted.forEach(p => {
-                if(counts[p.position] > 0) {
-                    p.isStarting = true;
-                    counts[p.position]--;
+                if (!teams[player.Country]) {
+                    teams[player.Country] = {
+                        name: player.Country, group: player.Group, players: [],
+                        points: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0,
+                        eliminated: false, stageReached: 'Group Stage', currentFormation: "4-4-2",
+                        selectedLineupIds: [], MatchH2HMap: {} 
+                    };
                 }
-            });
+                teams[player.Country].players.push(player);
 
-            let assigned = t.players.filter(p => p.isStarting).length;
-            if (assigned < 11) {
-                t.players.forEach(p => {
-                    if(!p.isStarting && assigned < 11) {
-                        p.isStarting = true;
-                        assigned++;
-                    }
-                });
+                if (!groups[player.Group]) groups[player.Group] = [];
+                if (!groups[player.Group].includes(player.Country)) {
+                    groups[player.Group].push(player.Country);
+                }
             }
-        }
 
-        function generateGroups() {
-            let shuffledTeams = [...teamNames].sort(() => Math.random() - 0.5);
-            for(let i=0; i<8; i++) {
-                let letter = groupLetters[i];
-                groups[letter] = [
-                    shuffledTeams[i*4],
-                    shuffledTeams[i*4 + 1],
-                    shuffledTeams[i*4 + 2],
-                    shuffledTeams[i*4 + 3]
-                ];
-            }
-        }
-
-        function generateGroupFixtures() {
-            groupFixtures = [];
-            for (let m = 1; m <= 3; m++) {
-                let roundMatches = [];
-                groupLetters.forEach(letter => {
-                    let g = groups[letter];
-                    if(m === 1) {
-                        roundMatches.push({ home: g[0], away: g[1], stage: `Group ${letter}`, played: false });
-                        roundMatches.push({ home: g[2], away: g[3], stage: `Group ${letter}`, played: false });
-                    } else if(m === 2) {
-                        roundMatches.push({ home: g[0], away: g[2], stage: `Group ${letter}`, played: false });
-                        roundMatches.push({ home: g[1], away: g[3], stage: `Group ${letter}`, played: false });
-                    } else if(m === 3) {
-                        roundMatches.push({ home: g[0], away: g[3], stage: `Group ${letter}`, played: false });
-                        roundMatches.push({ home: g[1], away: g[2], stage: `Group ${letter}`, played: false });
-                    }
-                });
-                groupFixtures.push(roundMatches);
-            }
-        }
-
-        function renderTeamSelectionGrid() {
-            let grid = document.getElementById('team-selection-grid');
-            grid.innerHTML = "";
-            teamNames.forEach(tName => {
-                let card = document.createElement('div');
-                card.className = "team-card";
-                card.innerHTML = `<strong>${tName}</strong>`;
-                card.onclick = () => selectUserTeam(tName);
-                grid.appendChild(card);
-            });
-        }
-
-        function selectUserTeam(tName) {
-            userTeam = tName;
-            document.getElementById('dash-team-name').innerText = userTeam;
-            showScreen('screen-dashboard');
-            refreshDashboard();
+            showScreen('screen-choose-team');
+            document.getElementById('sub-header').innerText = "Select your national squad configuration";
+            renderTeamSelectionGrid();
         }
 
         function showScreen(screenId) {
@@ -618,618 +764,913 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        function renderGroupTables() {
-            let container = document.getElementById('group-stage-container');
-            container.innerHTML = "";
-            groupLetters.forEach(letter => {
-                let gTeams = groups[letter].map(name => teams[name]);
-                // Sort by points, then goal difference, then goals for
-                gTeams.sort((a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
+        function switchDashboardTab(tabId, el) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
 
-                let box = document.createElement('div');
-                box.className = "group-box";
-                box.innerHTML = `<h3>Group ${letter}</h3>`;
+        function renderTeamSelectionGrid() {
+            let grid = document.getElementById('group-selection-grid');
+            grid.innerHTML = '';
+            let sortedGroupNames = Object.keys(groups).sort();
+            
+            sortedGroupNames.forEach(gName => {
+                let card = document.createElement('div');
+                card.className = 'group-card';
+                let title = document.createElement('div');
+                title.className = 'group-title';
+                title.innerText = `Group ${gName}`;
+                card.appendChild(title);
 
-                let table = document.createElement('table');
-                table.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>Team</th>
-                            <th>P</th>
-                            <th>GD</th>
-                            <th>Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                `;
-                let tbody = table.querySelector('tbody');
-                gTeams.forEach(t => {
-                    let row = document.createElement('tr');
-                    if(t.name === userTeam) row.style.backgroundColor = "rgba(46, 125, 50, 0.3)";
-                    row.innerHTML = `
-                        <td title="${t.name}"><strong>${t.name.substring(0,10)}</strong></td>
-                        <td>${t.mp}</td>
-                        <td>${t.gd > 0 ? '+' + t.gd : t.gd}</td>
-                        <td><strong>${t.points}</strong></td>
-                    `;
-                    tbody.appendChild(row);
+                groups[gName].forEach(country => {
+                    let btn = document.createElement('button');
+                    btn.className = 'team-select-btn';
+                    btn.innerText = country;
+                    btn.onclick = () => selectUserTeam(country);
+                    card.appendChild(btn);
                 });
-                box.appendChild(table);
-                container.appendChild(box);
+                grid.appendChild(card);
             });
         }
 
-        function renderSquadLineupTable(containerId, isSubsModal = false) {
-            let tObj = teams[userTeam];
-            let tbody = document.getElementById(containerId);
-            tbody.innerHTML = "";
+        function selectUserTeam(countryName) {
+            userTeam = countryName;
+            document.getElementById('sub-header').innerText = `Managing: ${userTeam}`;
+            
+            let select = document.getElementById('group-view-select');
+            select.innerHTML = '';
+            Object.keys(groups).sort().forEach(gName => {
+                let opt = document.createElement('option');
+                opt.value = gName; opt.innerText = `Group ${gName}`;
+                if (groups[gName].includes(userTeam)) opt.selected = true;
+                select.appendChild(opt);
+            });
 
-            tObj.players.forEach((p, idx) => {
-                let row = document.createElement('tr');
-                row.className = "player-row";
+            Object.keys(teams).forEach(cName => {
+                let list = Object.keys(FORMATIONS);
+                teams[cName].currentFormation = (cName === userTeam) ? "4-4-2" : list[Math.floor(Math.random() * list.length)];
+                autoPickStartingLineup(cName);
+            });
+            
+            document.getElementById('user-formation-select').value = "4-4-2";
+            showScreen('screen-dashboard');
+            refreshDashboard();
+        }
 
-                let inputHtml = "";
-                if(isSubsModal) {
-                    let isDisabled = p.redCard || p.subbedOff;
-                    let isChecked = p.isStarting ? "checked" : "";
-                    inputHtml = `<input type="checkbox" id="modal-p-${idx}" ${isChecked} ${isDisabled ? 'disabled' : ''}>`;
-                } else {
-                    let isChecked = p.isStarting ? "checked" : "";
-                    inputHtml = `<input type="checkbox" id="dash-p-${idx}" ${isChecked} onchange="onDashLineupCheckChanged(${idx})">`;
+        function changeUserFormation() {
+            let selectedForm = document.getElementById('user-formation-select').value;
+            teams[userTeam].currentFormation = selectedForm;
+            autoPickStartingLineup(userTeam);
+            renderSquadManagement();
+            validateUserLineup();
+        }
+
+        function getEffectiveAbility(player) {
+            if (player.Suspended) return 0;
+            let nerf = Math.floor(player.Fatigue / 15); 
+            let eff = player.BaseAbility - nerf;
+            return eff < 10 ? 10 : eff;
+        }
+
+        function autoPickStartingLineup(countryName) {
+            let team = teams[countryName];
+            let config = FORMATIONS[team.currentFormation] || FORMATIONS["4-4-2"];
+
+            let available = team.players.filter(p => !p.Suspended).sort((a,b) => getEffectiveAbility(b) - getEffectiveAbility(a));
+            
+            let gks = available.filter(p => p.Position === 'GK');
+            let dfs = available.filter(p => p.Position === 'DF');
+            let mfs = available.filter(p => p.Position === 'MF');
+            let fws = available.filter(p => p.Position === 'FW');
+
+            let chosen = [];
+            if(gks[0]) chosen.push(gks[0].FullName);
+
+            dfs.slice(0, config.DF).forEach(p => chosen.push(p.FullName));
+            mfs.slice(0, config.MF).forEach(p => chosen.push(p.FullName));
+            fws.slice(0, config.FW).forEach(p => chosen.push(p.FullName));
+
+            let idx = 0;
+            while(chosen.length < 11 && idx < available.length) {
+                if(!chosen.includes(available[idx].FullName)) {
+                    chosen.push(available[idx].FullName);
                 }
+                idx++;
+            }
+            team.selectedLineupIds = chosen;
+        }
 
-                let statusText = "Bench";
-                if(p.isStarting) statusText = "🟢 Starting XI";
-                if(p.redCard) statusText = "🔴 Red Card";
-                else if(p.subbedOff) statusText = "❌ Subbed Off";
+        function refreshDashboard() {
+            document.getElementById('dash-team-name').innerText = userTeam;
+            let pickerContainer = document.getElementById('spectator-match-picker-container');
+            pickerContainer.style.display = "none";
+            
+            if (currentStage === 'Group Stage') {
+                document.getElementById('dash-stage-info').innerText = `Group Stage - Round ${currentRound} of 3 | Group ${teams[userTeam].group}`;
+                let match = getGroupFixtureForRound(teams[userTeam].group, userTeam, currentRound);
+                let opp = (match.home === userTeam) ? match.away : match.home;
+                document.getElementById('next-opponent').innerText = `${opp} (${match.home === userTeam ? 'Home' : 'Away'})`;
+            } else {
+                document.getElementById('dash-stage-info').innerText = `Knockout Phase - ${knockoutRoundName}`;
+                let uMatch = knockoutMatches.find(m => m.teamA === userTeam || m.teamB === userTeam);
+                if (uMatch && !teams[userTeam].eliminated) {
+                    let opp = (uMatch.teamA === userTeam) ? uMatch.teamB : uMatch.teamA;
+                    document.getElementById('next-opponent').innerText = uMatch.played ? "Concluded" : opp;
+                } else {
+                    document.getElementById('next-opponent').innerText = "Spectator Mode Viewer";
+                    pickerContainer.style.display = "block";
+                    populateSpectatorDropdown();
+                }
+            }
+
+            renderSquadManagement();
+            renderStandingsTable();
+            renderLeaderboards();
+            renderBracketTree();
+            validateUserLineup();
+        }
+
+        function populateSpectatorDropdown() {
+            let dropdown = document.getElementById('spectator-match-dropdown');
+            dropdown.innerHTML = '';
+            let unplayed = knockoutMatches.filter(m => !m.played);
+            unplayed.forEach((m, idx) => {
+                let opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = `${m.teamA} vs ${m.teamB}`;
+                dropdown.appendChild(opt);
+            });
+        }
+
+        function renderSquadManagement() {
+            let container = document.getElementById('squad-players-list');
+            container.innerHTML = '';
+            let team = teams[userTeam];
+            let posOrder = {'GK':1, 'DF':2, 'MF':3, 'FW':4};
+            
+            let sorted = [...team.players].sort((a,b) => {
+                if(posOrder[a.Position] !== posOrder[b.Position]) return posOrder[a.Position] - posOrder[b.Position];
+                return b.BaseAbility - a.BaseAbility;
+            });
+
+            sorted.forEach(p => {
+                let row = document.createElement('div');
+                let isSelected = team.selectedLineupIds.includes(p.FullName);
+                let isChecked = isSelected ? 'checked' : '';
+                
+                row.className = `player-row ${p.Suspended ? 'disabled' : ''}`;
+                
+                let effAbility = getEffectiveAbility(p);
+                let statusText = p.Suspended ? `<span style="color:var(--fw-color); font-weight:bold;">[SUSPENDED]</span> ` : `Fitness: ${100 - p.Fatigue}%`;
+                row.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" ${isChecked} ${p.Suspended ? 'disabled' : ''} onchange="togglePlayerSelection('${p.FullName}')" style="margin-right: 12px; transform: scale(1.1); cursor:pointer;">
+                        <span class="pos-badge pos-${p.Position}">${p.Position}</span>
+                        <div>
+                            <strong>${p.FullName}</strong> <span style="font-size:0.75rem; color:var(--text-muted);">${statusText}</span><br>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">${p.Club}</span>
+                        </div>
+                    </div>
+                    <div style="font-weight: bold; color: var(--gold);">Ability: ${effAbility} <span style="font-size:0.7rem; color:#888;">(${p.BaseAbility})</span></div>
+                `;
+                container.appendChild(row);
+            });
+            calculateSquadPowersAndReadout();
+        }
+
+        function togglePlayerSelection(fullName) {
+            let team = teams[userTeam];
+            let idx = team.selectedLineupIds.indexOf(fullName);
+            if (idx > -1) team.selectedLineupIds.splice(idx, 1);
+            else team.selectedLineupIds.push(fullName);
+            calculateSquadPowersAndReadout();
+            validateUserLineup();
+        }
+
+        function calculateSquadPowersAndReadout() {
+            let team = teams[userTeam];
+            let active = team.players.filter(p => team.selectedLineupIds.includes(p.FullName));
+            let gk = active.filter(p => p.Position === 'GK');
+            let df = active.filter(p => p.Position === 'DF');
+            let mf = active.filter(p => p.Position === 'MF');
+            let fw = active.filter(p => p.Position === 'FW');
+
+            let gkP = Math.round(gk.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (gk.length || 1));
+            let dfP = Math.round(df.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (df.length || 1));
+            let mfP = Math.round(mf.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (mf.length || 1));
+            let fwP = Math.round(fw.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (fw.length || 1));
+
+            document.getElementById('power-gk').innerText = gk.length ? gkP : 0;
+            document.getElementById('power-df').innerText = df.length ? dfP : 0;
+            document.getElementById('power-mf').innerText = mf.length ? mfP : 0;
+            document.getElementById('power-fw').innerText = fw.length ? fwP : 0;
+
+            document.getElementById('formation-readout').innerText = `Formation Layout: ${df.length}-${mf.length}-${fw.length}`;
+            document.getElementById('selection-count').innerText = `Selected: ${active.length} / 11`;
+
+            return { gk: gk.length, total: active.length };
+        }
+
+        function validateUserLineup() {
+            let counts = calculateSquadPowersAndReadout();
+            let errorMsg = document.getElementById('validation-error-msg');
+            let playBtn = document.getElementById('play-match-btn');
+
+            if (teams[userTeam].eliminated) {
+                errorMsg.innerText = "Your team is eliminated. Choose a match above to watch.";
+                errorMsg.style.color = "var(--gold)";
+                playBtn.disabled = false;
+                playBtn.innerText = "Spectate Match Live";
+                return;
+            }
+
+            if (counts.total !== 11) {
+                errorMsg.innerText = `Lineup invalid: Select exactly 11 players. Current count: ${counts.total}`;
+                errorMsg.style.color = "var(--fw-color)";
+                playBtn.disabled = true;
+                return;
+            }
+
+            if (counts.gk !== 1) {
+                errorMsg.innerText = `Lineup invalid: Select exactly 1 Goalkeeper.`;
+                errorMsg.style.color = "var(--fw-color)";
+                playBtn.disabled = true;
+                return;
+            }
+
+            errorMsg.innerText = "Squad roster verified and ready for match kickoff.";
+            errorMsg.style.color = "#4caf50";
+            playBtn.disabled = false;
+            playBtn.innerText = "Enter Match Field";
+        }
+
+        function getGroupFixtureForRound(gName, countryName, roundNum) {
+            let list = groups[gName];
+            let roundPairings = groupRoundsSchedule[roundNum - 1];
+            let uIdx = list.indexOf(countryName);
+            for (let pairing of roundPairings) {
+                if (pairing.t1 === uIdx || pairing.t2 === uIdx) {
+                    return { home: list[pairing.t1], away: list[pairing.t2] };
+                }
+            }
+            return null;
+        }
+
+        function getSortedGroupTeams(gName) {
+            let list = [...groups[gName]];
+            list.sort((a,b) => {
+                let tA = teams[a];
+                let tB = teams[b];
+                if (tB.points !== tA.points) return tB.points - tA.points;
+                if (tA.MatchH2HMap[b] !== undefined) {
+                    if (tA.MatchH2HMap[b] === 'lost') return 1;
+                    if (tA.MatchH2HMap[b] === 'won') return -1;
+                }
+                if (tB.gd !== tA.gd) return tB.gd - tA.gd;
+                return tB.gf - tA.gf;
+            });
+            return list;
+        }
+
+        function renderStandingsTable() {
+            let select = document.getElementById('group-view-select');
+            let selectedGroup = select.value || teams[userTeam].group;
+            let tbody = document.getElementById('standings-table-body');
+            tbody.innerHTML = '';
+
+            let sortedTeams = getSortedGroupTeams(selectedGroup);
+            sortedTeams.forEach((tName, index) => {
+                let t = teams[tName];
+                let row = document.createElement('tr');
+                if (index < 2) row.className = 'advance-zone';
+                else if (index === 2) row.className = 'best-third-zone';
 
                 row.innerHTML = `
-                    <td>${inputHtml}</td>
-                    <td><strong>${p.name}</strong></td>
-                    <td class="pos-${p.position.toLowerCase()}">${p.position}</td>
-                    <td>${p.overall}</td>
-                    <td style="font-size:0.85rem;">${statusText}</td>
+                    <td>${index + 1}</td>
+                    <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName === userTeam ? '⭐ ' : ''}${tName}</td>
+                    <td>${t.won + t.drawn + t.lost}</td>
+                    <td>${t.won}</td>
+                    <td>${t.drawn}</td>
+                    <td>${t.lost}</td>
+                    <td>${t.gd > 0 ? '+' : ''}${t.gd}</td>
+                    <td style="font-weight: bold; color: var(--gold);">${t.points}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        function onDashLineupCheckChanged(idx) {
-            let tObj = teams[userTeam];
-            let checkbox = document.getElementById(`dash-p-${idx}`);
-            tObj.players[idx].isStarting = checkbox.checked;
-            validateDashboardLineup();
+        function renderLeaderboards() {
+            let allPlayers = playersRaw;
+            
+            let scorers = [...allPlayers].filter(p => p.Goals > 0).sort((a,b) => b.Goals - a.Goals).slice(0, 5);
+            let sHtml = scorers.map(p => `<tr><td><strong>${p.FullName}</strong> (${p.Country})</td><td style="text-align:right;font-weight:bold;color:var(--gold);">${p.Goals}</td></tr>`).join('');
+            document.getElementById('leaderboard-goals').innerHTML = sHtml || '<tr><td style="color:#666;">No goals logged yet</td></tr>';
+
+            let assists = [...allPlayers].filter(p => p.Assists > 0).sort((a,b) => b.Assists - a.Assists).slice(0, 5);
+            let aHtml = assists.map(p => `<tr><td><strong>${p.FullName}</strong> (${p.Country})</td><td style="text-align:right;font-weight:bold;color:var(--gold);">${p.Assists}</td></tr>`).join('');
+            document.getElementById('leaderboard-assists').innerHTML = aHtml || '<tr><td style="color:#666;">No assists logged yet</td></tr>';
+
+            let clean = [...allPlayers].filter(p => p.Position === 'GK' && p.CleanSheets > 0).sort((a,b) => b.CleanSheets - a.CleanSheets).slice(0, 5);
+            let cHtml = clean.map(p => `<tr><td><strong>${p.FullName}</strong> (${p.Country})</td><td style="text-align:right;font-weight:bold;color:var(--gk-color);">${p.CleanSheets}</td></tr>`).join('');
+            document.getElementById('leaderboard-cleansheets').innerHTML = cHtml || '<tr><td style="color:#666;">No clean sheets logged yet</td></tr>';
         }
 
-        function validateDashboardLineup() {
-            let tObj = teams[userTeam];
-            let currentStarts = tObj.players.filter(p => p.isStarting).length;
-            let msgBox = document.getElementById('lineup-validation-msg');
-            let btn = document.getElementById('btn-play-match');
+        function renderBracketTree() {
+            let container = document.getElementById('bracket-tree-root');
+            let keys = Object.keys(knockoutHistoryTree);
+            if (keys.length === 0) return;
 
-            if(currentStarts === 11) {
-                msgBox.innerText = "";
-                if (btn) btn.disabled = false;
-                return true;
-            } else {
-                msgBox.innerText = `Lineup requires exactly 11 players. Currently selected: ${currentStarts}`;
-                if (btn) btn.disabled = true;
-                return false;
-            }
+            container.innerHTML = '';
+            let order = ['Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Final'];
+
+            order.forEach(rName => {
+                if(!knockoutHistoryTree[rName] && rName !== knockoutRoundName) return;
+                let roundCol = document.createElement('div');
+                roundCol.className = 'bracket-round';
+
+                let title = document.createElement('div');
+                title.style.cssText = "text-align:center; font-weight:bold; color:var(--gold); border-bottom:1px solid #333; margin-bottom:10px; font-size:0.85rem;";
+                title.innerText = rName;
+                roundCol.appendChild(title);
+
+                let roundMatches = knockoutHistoryTree[rName] || knockoutMatches;
+                roundMatches.forEach(m => {
+                    let node = document.createElement('div');
+                    node.className = 'bracket-match-node';
+                    
+                    let winA = m.played && m.scoreA > m.scoreB ? 'bracket-winner' : '';
+                    let winB = m.played && m.scoreB > m.scoreA ? 'bracket-winner' : '';
+                    let scoreStrA = m.played ? m.scoreA : '-';
+                    let scoreStrB = m.played ? m.scoreB : '-';
+
+                    node.innerHTML = `
+                        <div class="${winA}"><span>${m.teamA || 'TBD'}</span><span>${scoreStrA}</span></div>
+                        <div class="${winB}"><span>${m.teamB || 'TBD'}</span><span>${scoreStrB}</span></div>
+                    `;
+                    roundCol.appendChild(node);
+                });
+                container.appendChild(roundCol);
+            });
         }
 
-        function refreshDashboard() {
-            let title = document.getElementById('dash-stage-title');
-            let homeLbl = document.getElementById('dash-home-team');
-            let awayLbl = document.getElementById('dash-away-team');
-            let elimSelectorBox = document.getElementById('box-eliminated-selector');
+        function startMatchSimulation() {
+            showScreen('screen-match');
+            savedDayResults = [];
+            isSimPaused = false;
+            simMinute = 0;
 
-            renderGroupTables();
+            document.getElementById('match-pause-btn').style.display = 'inline-block';
+            document.getElementById('match-resume-btn').style.display = 'none';
+            document.getElementById('match-skip-btn').removeAttribute('disabled');
+            document.getElementById('match-continue-btn').style.display = 'none';
+            document.getElementById('match-commentary').innerHTML = '';
 
-            if (currentStage === "group") {
-                title.innerText = `Group Stage - Matchday ${currentGroupMatchday}`;
-                elimSelectorBox.style.display = "none";
-                
-                let matches = groupFixtures[currentGroupMatchday - 1];
-                let userMatch = matches.find(m => m.home === userTeam || m.away === userTeam);
+            let primaryMatch = null;
 
-                if (userMatch) {
-                    homeLbl.innerText = userMatch.home;
-                    awayLbl.innerText = userMatch.away;
-                    activeMatchIdx = matches.indexOf(userMatch);
-                }
-                renderSquadLineupTable('squad-table-body', false);
-                validateDashboardLineup();
+            if (currentStage === 'Group Stage') {
+                let userGroup = teams[userTeam].group;
+                let pairings = groupRoundsSchedule[currentRound - 1];
+                let groupList = groups[userGroup];
+
+                pairings.forEach(p => {
+                    let hName = groupList[p.t1];
+                    let aName = groupList[p.t2];
+                    let mObj = createMatchEngineObject(hName, aName, false);
+                    if (hName === userTeam || aName === userTeam) {
+                        primaryMatch = mObj;
+                    } else {
+                        savedDayResults.push(mObj);
+                    }
+                });
+
+                Object.keys(groups).forEach(gName => {
+                    if (gName === userGroup) return;
+                    let list = groups[gName];
+                    pairings.forEach(p => {
+                        savedDayResults.push(createMatchEngineObject(list[p.t1], list[p.t2], true));
+                    });
+                });
             } else {
-                // KNOCKOUT STAGES
-                let stageNames = { R32: "Round of 32", R16: "Round of 16", QF: "Quarter-finals", SF: "Semifinals", Final: "Final Match" };
-                title.innerText = stageNames[currentStage] || currentStage;
-
-                let uObj = teams[userTeam];
-                if (!uObj.eliminated) {
-                    elimSelectorBox.style.display = "none";
-                    document.getElementById('box-lineup-management').style.display = "block";
-                    
-                    let userMatch = knockoutMatches.find(m => m.home === userTeam || m.away === userTeam);
-                    homeLbl.innerText = userMatch.home;
-                    awayLbl.innerText = userMatch.away;
-                    activeMatchIdx = knockoutMatches.indexOf(userMatch);
-                    
-                    renderSquadLineupTable('squad-table-body', false);
-                    validateDashboardLineup();
-                } else {
-                    // USER ELIMINATED - PROMPT MATCH CHOICE
-                    document.getElementById('box-lineup-management').style.display = "none";
-                    elimSelectorBox.style.display = "block";
-                    
+                if (teams[userTeam].eliminated) {
+                    let dropdown = document.getElementById('spectator-match-dropdown');
+                    let chosenIdx = parseInt(dropdown.value || '0', 10);
                     let unplayed = knockoutMatches.filter(m => !m.played);
-                    if(unplayed.length === 0) {
-                        return;
-                    }
+                    let chosenMatch = unplayed[chosenIdx];
 
-                    if(chosenNeutralMatchIdx === null || knockoutMatches[chosenNeutralMatchIdx].played) {
-                        let dynamicIndex = knockoutMatches.findIndex(m => !m.played);
-                        chosenNeutralMatchIdx = dynamicIndex !== -1 ? dynamicIndex : 0;
-                    }
-
-                    let activeM = knockoutMatches[chosenNeutralMatchIdx];
-                    homeLbl.innerText = activeM.home;
-                    awayLbl.innerText = activeM.away;
-                    activeMatchIdx = chosenNeutralMatchIdx;
-
-                    let btnContainer = document.getElementById('eliminated-match-buttons');
-                    btnContainer.innerHTML = "";
-                    knockoutMatches.forEach((m, idx) => {
-                        if(!m.played) {
-                            let mBtn = document.createElement('button');
-                            mBtn.style.fontSize = "0.85rem";
-                            mBtn.style.padding = "6px 12px";
-                            mBtn.style.backgroundColor = (idx === chosenNeutralMatchIdx) ? "var(--gold)" : "#444";
-                            if(idx === chosenNeutralMatchIdx) mBtn.style.color = "#000";
-                            mBtn.innerText = `${m.home} vs ${m.away}`;
-                            mBtn.onclick = () => {
-                                chosenNeutralMatchIdx = idx;
-                                refreshDashboard();
-                            };
-                            btnContainer.appendChild(mBtn);
+                    primaryMatch = createMatchEngineObject(chosenMatch.teamA, chosenMatch.teamB, false, chosenMatch);
+                    knockoutMatches.forEach(m => {
+                        if (m !== chosenMatch && !m.played) {
+                            savedDayResults.push(createMatchEngineObject(m.teamA, m.teamB, true, m));
                         }
                     });
-
-                    let playBtn = document.getElementById('btn-play-match');
-                    playBtn.disabled = false;
+                } else {
+                    let uMatch = knockoutMatches.find(m => !m.played && (m.teamA === userTeam || m.teamB === userTeam));
+                    primaryMatch = createMatchEngineObject(uMatch.teamA, uMatch.teamB, false, uMatch);
+                    knockoutMatches.forEach(m => {
+                        if (m !== uMatch && !m.played) {
+                            savedDayResults.push(createMatchEngineObject(m.teamA, m.teamB, true, m));
+                        }
+                    });
                 }
             }
-        }
 
-        // OPEN IN GAME SUBS MODAL WHILE SIMULATING
-        function openInGameSubs() {
-            let activeMatch = (currentStage === "group") ? groupFixtures[currentGroupMatchday-1][activeMatchIdx] : knockoutMatches[activeMatchIdx];
-            // Only allow player to manage if their own team is playing
-            if(activeMatch.home !== userTeam && activeMatch.away !== userTeam) {
-                alert("You can only manage your own team's substitutions!");
-                return;
-            }
+            activeMatchSimulation = primaryMatch;
             
-            clearInterval(simInterval); // Pause game clock
-            document.getElementById('modal-sub-count-text').innerText = teams[userTeam].totalSubsThisMatch;
-            document.getElementById('modal-subs-validation-msg').innerText = "";
-            renderSquadLineupTable('modal-subs-table-body', true);
-            document.getElementById('subs-overlay-modal').style.style.display = "flex";
-        }
-
-        function closeInGameSubs() {
-            document.getElementById('subs-overlay-modal').style.style.display = "none";
-            if (!isHalfTimePaused && simTime < 90) {
-                // Resume game loop if not stuck at half time break
-                simInterval = setInterval(processMatchTick, 333); 
-            }
-        }
-
-        function saveInGameSubs() {
-            let tObj = teams[userTeam];
-            let newStartersIndices = [];
-            let currentStartersCount = 0;
-
-            // Gather checkbox states
-            tObj.players.forEach((p, idx) => {
-                let box = document.getElementById(`modal-p-${idx}`);
-                if(box && box.checked) {
-                    newStartersIndices.push(idx);
-                    currentStartersCount++;
-                }
-            });
-
-            if(currentStartersCount !== 11) {
-                document.getElementById('modal-subs-validation-msg').innerText = `Error: Lineup must contain exactly 11 players. Selected: ${currentStartersCount}`;
-                return;
-            }
-
-            // Calculate potential modifications
-            let substitutionsMadeThisWindow = 0;
-            tObj.players.forEach((p, idx) => {
-                let isChecked = newStartersIndices.includes(idx);
-                // Transitioning from Starting to Bench = Subbed OFF
-                if(p.isStarting && !isChecked) {
-                    substitutionsMadeThisWindow++;
-                }
-            });
-
-            if(tObj.totalSubsThisMatch + substitutionsMadeThisWindow > 5) {
-                document.getElementById('modal-subs-validation-msg').innerText = `Error: Cannot exceed maximum limit of 5 total substitutions!`;
-                return;
-            }
-
-            // Commit modifications
-            tObj.players.forEach((p, idx) => {
-                let isChecked = newStartersIndices.includes(idx);
-                if(p.isStarting && !isChecked) {
-                    p.isStarting = false;
-                    p.subbedOff = true;
-                } else if(!p.isStarting && isChecked) {
-                    p.isStarting = true;
-                    p.subbedOnCount++;
-                }
-            });
-
-            tObj.totalSubsThisMatch += substitutionsMadeThisWindow;
+            document.getElementById('match-teamA-name').innerText = activeMatchSimulation.teamA;
+            document.getElementById('match-teamB-name').innerText = activeMatchSimulation.teamB;
+            document.getElementById('match-live-score').innerText = "0 - 0";
             
-            // Re-render dashboard behind scenes & exit modal
-            renderSquadLineupTable('squad-table-body', false);
-            closeInGameSubs();
+            // Show sub count context if it's the user's team playing
+            let statsBar = document.getElementById('match-user-stats-bar');
+            if (activeMatchSimulation.teamA === userTeam || activeMatchSimulation.teamB === userTeam) {
+                statsBar.style.display = 'flex';
+                document.getElementById('user-subs-count').innerText = `${activeMatchSimulation.userSubsUsed} / 5`;
+            } else {
+                statsBar.style.display = 'none';
+            }
+
+            logCommentaryLine(`⚽ Welcome to the live arena! Match kickoff between ${activeMatchSimulation.teamA} and ${activeMatchSimulation.teamB} is underway!`, 'info');
+            updateLivePowerBoxes();
+
+            // 30 seconds per half = 60 seconds total. 90 minutes / 60 seconds = 1.5 seconds per ticks = 660ms per minute interval roughly
+            // To make it exactly 30 seconds per half, total match is 60000ms. 90 simulation iterations -> 60000/90 = 666ms per sim minute.
+            matchIntervalTimer = setInterval(tickSimulationMinute, 666);
         }
 
-        function resumeSecondHalf() {
-            isHalfTimePaused = false;
-            document.getElementById('btn-match-half').style.display = "none";
-            document.getElementById('btn-match-subs').disabled = false;
-            simInterval = setInterval(processMatchTick, 333); // 30 seconds for second half
-        }
+        function createMatchEngineObject(tA, tB, autoSimmed, referenceKnockoutObj = null) {
+            if(tA !== userTeam) autoPickStartingLineup(tA);
+            if(tB !== userTeam) autoPickStartingLineup(tB);
 
-        // MATCH SIMULATION ENGINE WORKINGS
-        function startMatchSimulation() {
-            let activeMatch = (currentStage === "group") ? groupFixtures[currentGroupMatchday-1][activeMatchIdx] : knockoutMatches[activeMatchIdx];
-            
-            // Prepare reset statuses
-            autoPickStartingLineup(activeMatch.home);
-            autoPickStartingLineup(activeMatch.away);
-
-            teamAData = teams[activeMatch.home];
-            teamBData = teams[activeMatch.away];
-
-            matchScoreA = 0;
-            matchScoreB = 0;
-            simTime = 0;
-            matchScorers = [];
-            isHalfTimePaused = false;
-
-            matchStats = {
-                shotsA: 0, shotsB: 0,
-                foulsA: 0, foulsB: 0,
-                yellowA: 0, yellowB: 0,
-                redA: 0, redB: 0
+            let engine = {
+                teamA: tA, teamB: tB, scoreA: 0, scoreB: 0,
+                autoPilot: autoSimmed, ref: referenceKnockoutObj,
+                played: false, userSubsUsed: 0,
+                timelineGoalscorersA: [], timelineGoalscorersB: []
             };
-
-            document.getElementById('match-stage-label').innerText = activeMatch.stage || currentStage;
-            document.getElementById('sim-team-a').innerText = teamAData.name;
-            document.getElementById('sim-team-b').innerText = teamBData.name;
-            document.getElementById('sim-score-a').innerText = "0";
-            document.getElementById('sim-score-b').innerText = "0";
-            document.getElementById('sim-time').innerText = "0";
-            document.getElementById('sim-scorers').innerText = "";
-
-            document.getElementById('stat-lbl-team-a').innerText = teamAData.name;
-            document.getElementById('stat-lbl-team-b').innerText = teamBData.name;
-            updateStatsUI();
-
-            let feed = document.getElementById('commentary-feed');
-            feed.innerHTML = `<div class="commentary-line">🏁 The match between ${teamAData.name} and ${teamBData.name} is about to kick off!</div>`;
-
-            document.getElementById('btn-finish-match').disabled = true;
-            document.getElementById('btn-finish-match').innerText = "Simulating Match...";
-            document.getElementById('btn-match-half').style.display = "none";
-            document.getElementById('btn-match-subs').disabled = (teamAData.name !== userTeam && teamBData.name !== userTeam);
-
-            showScreen('screen-match-sim');
-
-            // Total match duration ~60 seconds. ~333ms per tick runs 90 ticks in 30 seconds per half.
-            simInterval = setInterval(processMatchTick, 333);
+            return engine;
         }
 
-        function calculateTeamRating(teamObj) {
-            let starters = teamObj.players.filter(p => p.isStarting && !p.redCard);
-            if(starters.length === 0) return 40;
-            let total = starters.reduce((acc, p) => acc + p.overall, 0);
-            return total / starters.length;
+        function updateLivePowerBoxes() {
+            let pA = calculateLiveTeamPowers(activeMatchSimulation.teamA);
+            let pB = calculateLiveTeamPowers(activeMatchSimulation.teamB);
+
+            document.getElementById('live-power-home-text').innerHTML = `🔥 ATK: ${pA.fw} | MID: ${pA.mf} | DEF: ${pA.df}<br>🧤 GK: ${pA.gk}`;
+            document.getElementById('live-power-away-text').innerHTML = `🔥 ATK: ${pB.fw} | MID: ${pB.mf} | DEF: ${pB.df}<br>🧤 GK: ${pB.gk}`;
         }
 
-        function processMatchTick() {
-            simTime++;
-            document.getElementById('sim-time').innerText = simTime;
+        function calculateLiveTeamPowers(cName) {
+            let t = teams[cName];
+            let active = t.players.filter(p => t.selectedLineupIds.includes(p.FullName));
+            let gk = active.filter(p => p.Position === 'GK');
+            let df = active.filter(p => p.Position === 'DF');
+            let mf = active.filter(p => p.Position === 'MF');
+            let fw = active.filter(p => p.Position === 'FW');
 
-            let ratingA = calculateTeamRating(teamAData);
-            let ratingB = calculateTeamRating(teamBData);
+            return {
+                gk: Math.round(gk.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (gk.length || 1)),
+                df: Math.round(df.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (df.length || 1)),
+                mf: Math.round(mf.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (mf.length || 1)),
+                fw: Math.round(fw.reduce((sum, p) => sum + getEffectiveAbility(p), 0) / (fw.length || 1))
+            };
+        }
 
-            // Probability weights
-            let baseChance = 0.12; 
-            if (Math.random() < baseChance) {
-                let attacker = (Math.random() * (ratingA + ratingB) < ratingA) ? 'A' : 'B';
-                let offTeam = attacker === 'A' ? teamAData : teamBData;
-                let defTeam = attacker === 'A' ? teamBData : teamAData;
+        function tickSimulationMinute() {
+            if (isSimPaused) return;
 
-                let rng = Math.random();
-                if(rng < 0.45) {
-                    // Shot event
-                    if(attacker === 'A') matchStats.shotsA++; else matchStats.shotsB++;
-                    
-                    if (Math.random() < 0.28) {
-                        // GOAL
-                        let scorersPool = offTeam.players.filter(p => p.isStarting && !p.redCard && p.position !== "GK");
-                        if(scorersPool.length === 0) scorersPool = offTeam.players;
-                        let scorer = scorersPool[Math.floor(Math.random() * scorersPool.length)].name;
+            simMinute++;
+            document.getElementById('match-clock').innerText = `${simMinute.toString().padStart(2, '0')}:00`;
 
-                        if(attacker === 'A') {
-                            matchScoreA++;
-                            document.getElementById('sim-score-a').innerText = matchScoreA;
-                            matchScorers.push({ name: scorer, min: simTime, teamLabel: 'A' });
-                            logCommentary(`⚽ GOAL! ${scorer} scores an amazing goal for ${offTeam.name}!`, 'team-a-goal');
-                        } else {
-                            matchScoreB++;
-                            document.getElementById('sim-score-b').innerText = matchScoreB;
-                            matchScorers.push({ name: scorer, min: simTime, teamLabel: 'B' });
-                            logCommentary(`⚽ GOAL! ${scorer} strikes it beautifully into the net for ${offTeam.name}!`, 'team-b-goal');
-                        }
-                        updateScorersDisplay();
-                    } else {
-                        logCommentary(`💥 Shot by ${offTeam.name} goes wide of the post.`);
-                    }
-                } else if(rng < 0.80) {
-                    // Foul event
-                    if(attacker === 'A') matchStats.foulsB++; else matchStats.foulsA++;
-                    let foulPool = defTeam.players.filter(p => p.isStarting && !p.redCard);
-                    
-                    if(foulPool.length > 0 && Math.random() < 0.35) {
-                        let targetedPlayer = foulPool[Math.floor(Math.random() * foulPool.length)];
-                        
-                        if(Math.random() < 0.12) {
-                            targetedPlayer.redCard = true;
-                            targetedPlayer.isStarting = false; 
-                            if(attacker === 'A') matchStats.redB++; else matchStats.redA++;
-                            logCommentary(`🔴 RED CARD! Rough tackle by ${targetedPlayer.name} (${defTeam.name}). They are sent off!`);
-                        } else {
-                            targetedPlayer.yellowCards++;
-                            if(attacker === 'A') matchStats.yellowB++; else matchStats.yellowA++;
-                            if(targetedPlayer.yellowCards >= 2) {
-                                targetedPlayer.redCard = true;
-                                targetedPlayer.isStarting = false;
-                                if(attacker === 'A') matchStats.redB++; else matchStats.redA++;
-                                logCommentary(`🟨🟨 Second Yellow turns to RED! ${targetedPlayer.name} (${defTeam.name}) leaves the pitch.`);
-                            } else {
-                                logCommentary(`🟨 Yellow Card issued to ${targetedPlayer.name} (${defTeam.name}).`);
-                            }
-                        }
-                    } else {
-                        logCommentary(`🩼 Foul committed by ${defTeam.name} in mid-field.`);
-                    }
-                } else {
-                    logCommentary(`🔄 Dangerous pass intercepted by ${defTeam.name} defense line.`);
-                }
-                updateStatsUI();
-            }
-
-            // HALFTIME PAUSE INTERRUPT BREAK
-            if(simTime === 45) {
-                clearInterval(simInterval);
-                isHalfTimePaused = true;
-                logCommentary(`⏸️ Half-Time whistle blows! Scores: ${teamAData.name} ${matchScoreA} - ${matchScoreB} ${teamBData.name}.`);
-                
-                if (teamAData.name === userTeam || teamBData.name === userTeam) {
-                    document.getElementById('btn-match-half').style.display = "inline-block";
-                    document.getElementById('btn-match-subs').disabled = false;
-                } else {
-                    // Auto-resume for neutral sims
-                    setTimeout(resumeSecondHalf, 1500);
-                }
+            // Half time pause event at exactly 45 minutes
+            if (simMinute === 45) {
+                isSimPaused = true;
+                logCommentaryLine(`⏸️ HALFTIME BREAK! The referee blows the whistle. Make changes if needed.`, 'info');
+                document.getElementById('match-pause-btn').style.display = 'none';
+                document.getElementById('match-resume-btn').style.display = 'inline-block';
                 return;
             }
 
-            // FULLTIME REACHED
-            if(simTime >= 90) {
-                // If knockout match is tied, execute extra time calculations instantly
-                if(currentStage !== "group" && matchScoreA === matchScoreB) {
-                    logCommentary(`⏳ Full time tie! Simulating Extra Time & Penalty Shootouts...`);
-                    if(Math.random() < 0.5) {
-                        matchScoreA++;
-                        matchScorers.push({ name: "Penalty Shootout Winner", min: 120, teamLabel: 'A' });
-                    } else {
-                        matchScoreB++;
-                        matchScorers.push({ name: "Penalty Shootout Winner", min: 120, teamLabel: 'B' });
-                    }
-                    document.getElementById('sim-score-a').innerText = matchScoreA;
-                    document.getElementById('sim-score-b').innerText = matchScoreB;
-                    updateScorersDisplay();
-                }
+            // Simulate chance mechanics every minute
+            if (Math.random() < 0.12) {
+                executeLiveChanceChance();
+            }
 
-                clearInterval(simInterval);
-                logCommentary(`🏁 Full-Time whistle blows! Final Score: ${teamAData.name} ${matchScoreA}, ${teamBData.name} ${matchScoreB}.`);
-                document.getElementById('btn-finish-match').disabled = false;
-                document.getElementById('btn-finish-match').innerText = "Return to Dashboard";
+            if (simMinute >= 90) {
+                if (currentStage !== 'Group Stage' && activeMatchSimulation.scoreA === activeMatchSimulation.scoreB) {
+                    // Penalty Shootouts Resolution
+                    let winA = Math.random() > 0.5;
+                    if(winA) { activeMatchSimulation.scoreA++; logCommentaryLine(`🎯 [PENALTIES] ${activeMatchSimulation.teamA} wins the shootout drama!`, 'info'); }
+                    else { activeMatchSimulation.scoreB++; logCommentaryLine(`🎯 [PENALTIES] ${activeMatchSimulation.teamB} wins the shootout drama!`, 'info'); }
+                }
+                concludeLiveSimulationEngine();
             }
         }
 
-        function updateScorersDisplay() {
-            let leftScorers = matchScorers.filter(s => s.teamLabel === 'A').map(s => `${s.name} ${s.min}'`);
-            let rightScorers = matchScorers.filter(s => s.teamLabel === 'B').map(s => `${s.name} ${s.min}'`);
-            
-            let htmlStr = "";
-            if(leftScorers.length > 0) htmlStr += `(${teamAData.name}): ${leftScorers.join(', ')} `;
-            if(rightScorers.length > 0) htmlStr += `<br>(${teamBData.name}): ${rightScorers.join(', ')}`;
-            
-            document.getElementById('sim-scorers').innerHTML = htmlStr;
-        }
+        function executeLiveChanceChance() {
+            let pA = calculateLiveTeamPowers(activeMatchSimulation.teamA);
+            let pB = calculateLiveTeamPowers(activeMatchSimulation.teamB);
 
-        function logCommentary(msg, className = "") {
-            let feed = document.getElementById('commentary-feed');
-            let div = document.createElement('div');
-            div.className = "commentary-line " + className;
-            div.innerText = `[${simTime}'] ${msg}`;
-            feed.appendChild(div);
-            feed.scrollTop = feed.scrollHeight;
-        }
+            let weightA = (pA.fw + pA.mf) * 1.1;
+            let weightB = (pB.fw + pB.mf) * 1.1;
+            let total = weightA + weightB;
 
-        function updateStatsUI() {
-            document.getElementById('stat-shots-a').innerText = matchStats.shotsA;
-            document.getElementById('stat-shots-b').innerText = matchStats.shotsB;
-            document.getElementById('stat-fouls-a').innerText = matchStats.foulsA;
-            document.getElementById('stat-fouls-b').innerText = matchStats.foulsB;
-            document.getElementById('stat-yellow-a').innerText = matchStats.yellowA;
-            document.getElementById('stat-yellow-b').innerText = matchStats.yellowB;
-            document.getElementById('stat-red-a').innerText = matchStats.redA;
-            document.getElementById('stat-red-b').innerText = matchStats.redB;
-        }
-
-        function finishMatchSimulation() {
-            // Apply match values data onto persistent variables
-            let activeMatch = (currentStage === "group") ? groupFixtures[currentGroupMatchday-1][activeMatchIdx] : knockoutMatches[activeMatchIdx];
-            activeMatch.played = true;
-            activeMatch.scoreA = matchScoreA;
-            activeMatch.scoreB = matchScoreB;
-
-            applyMatchResultsData(activeMatch.home, activeMatch.away, matchScoreA, matchScoreB);
-
-            // Sim remaining round matches in background
-            if(currentStage === "group") {
-                let matches = groupFixtures[currentGroupMatchday - 1];
-                matches.forEach(m => {
-                    if(!m.played) simBackgroundMatch(m);
-                });
-
-                if(currentGroupMatchday < 3) {
-                    currentGroupMatchday++;
-                } else {
-                    advanceToKnockoutStage();
-                    showScreen('screen-dashboard');
-                    refreshDashboard();
-                    return;
+            if (Math.random() * total < weightA) {
+                // Team A Attacks
+                if (Math.random() * (pA.fw + pB.df) < pA.fw) {
+                    if (Math.random() * (pA.fw + pB.gk) > pB.gk) {
+                        activeMatchSimulation.scoreA++;
+                        let scorer = logGoalStatsData(activeMatchSimulation.teamA);
+                        activeMatchSimulation.timelineGoalscorersA.push(`${scorer} ${simMinute}'`);
+                        
+                        let currentScoreStr = `${activeMatchSimulation.teamA} ${activeMatchSimulation.scoreA}-${activeMatchSimulation.scoreB} ${activeMatchSimulation.teamB}`;
+                        let listStr = activeMatchSimulation.timelineGoalscorersA.concat(activeMatchSimulation.timelineGoalscorersB).join(', ');
+                        logCommentaryLine(`⚽ GOAL! ${currentScoreStr} (${listStr})`, 'home-team');
+                        document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB}`;
+                    }
                 }
             } else {
-                // Knockout stage: remove loser, update match object details
-                activeMatch.winner = matchScoreA > matchScoreB ? activeMatch.home : activeMatch.away;
-                activeMatch.loser = matchScoreA > matchScoreB ? activeMatch.away : activeMatch.home;
-                teams[activeMatch.loser].eliminated = true;
-                teams[activeMatch.loser].stageReached = currentStage;
+                // Team B Attacks
+                if (Math.random() * (pB.fw + pA.df) < pB.fw) {
+                    if (Math.random() * (pB.fw + pA.gk) > pA.gk) {
+                        activeMatchSimulation.scoreB++;
+                        let scorer = logGoalStatsData(activeMatchSimulation.teamB);
+                        activeMatchSimulation.timelineGoalscorersB.push(`${scorer} ${simMinute}'`);
 
-                // Auto-sim all other matches in this level
-                knockoutMatches.forEach(m => {
-                    if(!m.played) {
-                        simBackgroundMatch(m);
-                        m.winner = m.scoreA > m.scoreB ? m.home : m.away;
-                        m.loser = m.scoreA > m.scoreB ? m.away : m.home;
-                        teams[m.loser].eliminated = true;
-                        teams[m.loser].stageReached = currentStage;
+                        let currentScoreStr = `${activeMatchSimulation.teamA} ${activeMatchSimulation.scoreA}-${activeMatchSimulation.scoreB} ${activeMatchSimulation.teamB}`;
+                        let listStr = activeMatchSimulation.timelineGoalscorersA.concat(activeMatchSimulation.timelineGoalscorersB).join(', ');
+                        logCommentaryLine(`⚽ GOAL! ${currentScoreStr} (${listStr})`, 'away-team');
+                        document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB}`;
                     }
+                }
+            }
+
+            // Random Rare Card Events
+            if (Math.random() < 0.02) {
+                let attackA = Math.random() > 0.5;
+                let targetTeam = attackA ? activeMatchSimulation.teamA : activeMatchSimulation.teamB;
+                let roster = teams[targetTeam].players.filter(p => teams[targetTeam].selectedLineupIds.includes(p.FullName));
+                if (roster.length > 2) {
+                    let randomPlayer = roster[Math.floor(Math.random() * roster.length)];
+                    randomPlayer.Suspended = true;
+                    let index = teams[targetTeam].selectedLineupIds.indexOf(randomPlayer.FullName);
+                    if(index > -1) teams[targetTeam].selectedLineupIds.splice(index, 1);
+                    logCommentaryLine(`🟥 RED CARD! ${randomPlayer.FullName} (${targetTeam}) is ejected from the field!`, 'redcard');
+                    updateLivePowerBoxes();
+                }
+            }
+        }
+
+        function logGoalStatsData(countryName) {
+            let t = teams[countryName];
+            let active = t.players.filter(p => t.selectedLineupIds.includes(p.FullName));
+            let strikers = active.filter(p => p.Position === 'FW' || p.Position === 'MF');
+            if(strikers.length === 0) strikers = active;
+            
+            let scorer = strikers[Math.floor(Math.random() * strikers.length)];
+            scorer.Goals++;
+
+            let allocatableAssists = active.filter(p => p !== scorer && p.Position !== 'GK');
+            if (allocatableAssists.length && Math.random() > 0.4) {
+                let assister = allocatableAssists[Math.floor(Math.random() * allocatableAssists.length)];
+                assister.Assists++;
+            }
+            return scorer.FullName;
+        }
+
+        function logCommentaryLine(txt, styleClass) {
+            let box = document.getElementById('match-commentary');
+            let line = document.createElement('div');
+            line.className = `commentary-line ${styleClass}`;
+            line.innerText = `[MIN ${simMinute}] ${txt}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function triggerTacticalPause() {
+            isSimPaused = true;
+            document.getElementById('match-pause-btn').style.display = 'none';
+            document.getElementById('match-resume-btn').style.display = 'inline-block';
+            openSubModal();
+        }
+
+        function resumeTacticalSimulation() {
+            isSimPaused = false;
+            document.getElementById('match-pause-btn').style.display = 'inline-block';
+            document.getElementById('match-resume-btn').style.display = 'none';
+        }
+
+        function openSubModal() {
+            let overlay = document.getElementById('sub-modal-overlay');
+            overlay.classList.add('active');
+            document.getElementById('modal-sub-error').innerText = '';
+
+            let container = document.getElementById('modal-combined-roster-list');
+            container.innerHTML = '';
+
+            let team = teams[userTeam];
+            let posOrder = {'GK':1, 'DF':2, 'MF':3, 'FW':4};
+            let sorted = [...team.players].sort((a,b) => posOrder[a.Position] - posOrder[b.Position]);
+
+            // Temp snapshot array to store selected items inside the modal checklist framework
+            window.modalLineupSelection = [...team.selectedLineupIds];
+
+            sorted.forEach(p => {
+                let btn = document.createElement('div');
+                btn.className = 'sub-item-btn';
+                
+                let isSelected = window.modalLineupSelection.includes(p.FullName);
+                let checkedAttr = isSelected ? 'checked' : '';
+                
+                let isDisabled = p.Suspended || p.subbedOff;
+                let statusInfo = '';
+                if (p.Suspended) statusInfo = ' [RED CARD]';
+                else if (p.subbedOff) statusInfo = ' [OUT]';
+                else if (p.subOnCount > 0) statusInfo = ` [Subs: ${p.subOnCount}/5]`;
+
+                btn.innerHTML = `
+                    <label style="display:flex; align-items:center; width:100%; cursor:${isDisabled ? 'not-allowed' : 'pointer'};">
+                        <input type="checkbox" ${checkedAttr} ${isDisabled ? 'disabled' : ''} onchange="toggleModalCheckbox(this, '${p.FullName}')" style="margin-right:10px;">
+                        <span class="pos-badge pos-${p.Position}">${p.Position}</span>
+                        <span><strong>${p.FullName}</strong> <small style="color:var(--text-muted);">${statusInfo}</small></span>
+                    </label>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function toggleModalCheckbox(checkbox, fullName) {
+            let idx = window.modalLineupSelection.indexOf(fullName);
+            if (checkbox.checked) {
+                if (idx === -1) window.modalLineupSelection.push(fullName);
+            } else {
+                if (idx > -1) window.modalLineupSelection.splice(idx, 1);
+            }
+        }
+
+        function confirmManagerSubstitution() {
+            let team = teams[userTeam];
+            let currentActiveList = team.selectedLineupIds;
+            let targetActiveList = window.modalLineupSelection;
+
+            // Roster configuration validation checks
+            if (targetActiveList.length !== 11) {
+                document.getElementById('modal-sub-error').innerText = `Roster must contain exactly 11 active players. Selected: ${targetActiveList.length}`;
+                return;
+            }
+
+            let activeGks = team.players.filter(p => targetActiveList.includes(p.FullName) && p.Position === 'GK');
+            if (activeGks.length !== 1) {
+                document.getElementById('modal-sub-error').innerText = "Roster must contain exactly 1 Goalkeeper.";
+                return;
+            }
+
+            // Identify changes to calculate sub metrics safely
+            let playersSubbedOn = targetActiveList.filter(name => !currentActiveList.includes(name));
+            let playersSubbedOff = currentActiveList.filter(name => !targetActiveList.includes(name));
+
+            let errorLogged = false;
+            playersSubbedOn.forEach(name => {
+                let p = team.players.find(x => x.FullName === name);
+                if (p.subOnCount >= 5) {
+                    document.getElementById('modal-sub-error').innerText = `${p.FullName} reached the maximum 5 substitutions ceiling.`;
+                    errorLogged = true;
+                }
+            });
+
+            if (errorLogged) return;
+
+            // Commit transaction mutations
+            playersSubbedOn.forEach(name => {
+                let p = team.players.find(x => x.FullName === name);
+                p.subOnCount++;
+                activeMatchSimulation.userSubsUsed++;
+                logCommentaryLine(`🔄 SUB ON: ${p.FullName} enters the match field.`, 'info');
+            });
+
+            playersSubbedOff.forEach(name => {
+                let p = team.players.find(x => x.FullName === name);
+                p.subbedOff = true;
+                logCommentaryLine(`🔄 SUB OFF: ${p.FullName} exits to the bench.`, 'info');
+            });
+
+            team.selectedLineupIds = [...targetActiveList];
+            document.getElementById('user-subs-count').innerText = `${activeMatchSimulation.userSubsUsed} / 5`;
+            
+            updateLivePowerBoxes();
+            closeSubModal();
+        }
+
+        function closeSubModal() {
+            document.getElementById('sub-modal-overlay').classList.remove('active');
+        }
+
+        function skipMatchAnimation() {
+            document.getElementById('match-skip-btn').setAttribute('disabled', 'true');
+            while(simMinute < 90) {
+                simMinute++;
+                if (Math.random() < 0.12) executeLiveChanceChance();
+            }
+            if (currentStage !== 'Group Stage' && activeMatchSimulation.scoreA === activeMatchSimulation.scoreB) {
+                let winA = Math.random() > 0.5;
+                if(winA) activeMatchSimulation.scoreA++; else activeMatchSimulation.scoreB++;
+            }
+            concludeLiveSimulationEngine();
+        }
+
+        function concludeLiveSimulationEngine() {
+            clearInterval(matchIntervalTimer);
+            activeMatchSimulation.played = true;
+
+            document.getElementById('match-pause-btn').style.display = 'none';
+            document.getElementById('match-resume-btn').style.display = 'none';
+            document.getElementById('match-skip-btn').setAttribute('disabled', 'true');
+            document.getElementById('match-clock').innerText = "90:00";
+            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB}`;
+
+            logCommentaryLine(`🏁 Full Time Whistle! Final scoreline secured: ${activeMatchSimulation.teamA} ${activeMatchSimulation.scoreA} - ${activeMatchSimulation.scoreB} ${activeMatchSimulation.teamB}`, 'info');
+
+            // Simulate concurrent automated matches safely behind the scenes
+            savedDayResults.forEach(m => {
+                let pA = calculateLiveTeamPowers(m.teamA);
+                let pB = calculateLiveTeamPowers(m.teamB);
+                
+                let goalChance = 0.22;
+                for (let min = 1; min <= 90; min++) {
+                    if (Math.random() < goalChance) {
+                        if (Math.random() * (pA.fw + pB.fw) < pA.fw) {
+                            if (Math.random() * (pA.fw + pB.gk) > pB.gk) m.scoreA++;
+                        } else {
+                            if (Math.random() * (pB.fw + pA.gk) > pA.gk) m.scoreB++;
+                        }
+                    }
+                }
+
+                if (currentStage !== 'Group Stage' && m.scoreA === m.scoreB) {
+                    if (Math.random() > 0.5) m.scoreA++; else m.scoreB++;
+                }
+                m.played = true;
+            });
+
+            // Display updating results side banner metrics
+            let sideBox = document.getElementById('simultaneous-match-results');
+            sideBox.innerHTML = '';
+            let allToday = [activeMatchSimulation].concat(savedDayResults);
+            allToday.forEach(m => {
+                let item = document.createElement('div');
+                item.style.padding = "5px 0";
+                item.style.borderBottom = "1px solid #222";
+                item.innerHTML = `🏁 <strong>${m.teamA}</strong> ${m.scoreA} - ${m.scoreB} <strong>${m.teamB}</strong>`;
+                sideBox.appendChild(item);
+            });
+
+            document.getElementById('match-continue-btn').style.display = 'inline-block';
+        }
+
+        function finishMatchDay() {
+            // Apply match outputs to data matrices safely
+            let allToday = [activeMatchSimulation].concat(savedDayResults);
+
+            allToday.forEach(m => {
+                let tA = teams[m.teamA];
+                let tB = teams[m.teamB];
+
+                tA.gf += m.scoreA; tA.ga += m.scoreB; tA.gd = tA.gf - tA.ga;
+                tB.gf += m.scoreB; tB.ga += m.scoreA; tB.gd = tB.gf - tB.ga;
+
+                if (m.scoreA > m.scoreB) {
+                    tA.won++; tB.lost++; tA.points += 3;
+                    tA.MatchH2HMap[m.teamB] = 'won'; tB.MatchH2HMap[m.teamA] = 'lost';
+                } else if (m.scoreB > m.scoreA) {
+                    tB.won++; tA.lost++; tB.points += 3;
+                    tB.MatchH2HMap[m.teamA] = 'won'; tA.MatchH2HMap[m.teamB] = 'lost';
+                } else {
+                    tA.drawn++; tB.drawn++; tA.points += 1; tB.points += 1;
+                    tA.MatchH2HMap[m.teamB] = 'draw'; tB.MatchH2HMap[m.teamA] = 'draw';
+                }
+
+                // Append GK Clean Sheet parameters
+                if(m.scoreB === 0) {
+                    let gk = tA.players.find(p => tA.selectedLineupIds.includes(p.FullName) && p.Position === 'GK');
+                    if(gk) gk.CleanSheets++;
+                }
+                if(m.scoreA === 0) {
+                    let gk = tB.players.find(p => tB.selectedLineupIds.includes(p.FullName) && p.Position === 'GK');
+                    if(gk) gk.CleanSheets++;
+                }
+
+                // Accumulated Fatigue tracking
+                tA.players.forEach(p => {
+                    if (tA.selectedLineupIds.includes(p.FullName)) p.Fatigue = Math.min(100, p.Fatigue + 18);
+                    else p.Fatigue = Math.max(0, p.Fatigue - 15);
+                });
+                tB.players.forEach(p => {
+                    if (tB.selectedLineupIds.includes(p.FullName)) p.Fatigue = Math.min(100, p.Fatigue + 18);
+                    else p.Fatigue = Math.max(0, p.Fatigue - 15);
                 });
 
-                advanceKnockoutRoundStructure();
+                // Clear substitution variables safely between game records
+                tA.players.forEach(p => { p.subOnCount = 0; p.subbedOff = false; });
+                tB.players.forEach(p => { p.subOnCount = 0; p.subbedOff = false; });
+
+                if (currentStage !== 'Group Stage' && m.ref) {
+                    m.ref.scoreA = m.scoreA;
+                    m.ref.scoreB = m.scoreB;
+                    m.ref.played = true;
+                    m.ref.winner = m.scoreA > m.scoreB ? m.teamA : m.teamB;
+                }
+            });
+
+            if (currentStage === 'Group Stage') {
+                if (currentRound < 3) {
+                    currentRound++;
+                } else {
+                    advanceGroupStageToKnockouts();
+                }
+            } else {
+                resolveKnockoutRoundAdvancement();
             }
 
             showScreen('screen-dashboard');
             refreshDashboard();
         }
 
-        function simBackgroundMatch(mObj) {
-            let rA = calculateTeamRating(teams[mObj.home]);
-            let rB = calculateTeamRating(teams[mObj.away]);
+        function advanceGroupStageToKnockouts() {
+            currentStage = 'Knockout Phase';
+            knockoutRoundName = 'Round of 32';
+            
+            let survivors = [];
+            let thirdPlacePool = [];
 
-            let scA = 0; let scB = 0;
-            for(let i=0; i<4; i++) {
-                if(Math.random() * (rA + rB) < rA) { if(Math.random() < 0.3) scA++; }
-                else { if(Math.random() < 0.3) scB++; }
-            }
-
-            if(currentStage !== "group" && scA === scB) {
-                if(Math.random() < 0.5) scA++; else scB++;
-            }
-
-            mObj.scoreA = scA;
-            mObj.scoreB = scB;
-            mObj.played = true;
-            applyMatchResultsData(mObj.home, mObj.away, scA, scB);
-        }
-
-        function applyMatchResultsData(home, away, sA, sB) {
-            let tA = teams[home];
-            let tB = teams[away];
-
-            tA.mp++; tA.gf += sA; tA.ga += sB; tA.gd = tA.gf - tA.ga;
-            tB.mp++; tB.gf += sB; tB.ga += sA; tB.gd = tB.gf - tB.ga;
-
-            if(sA > sB) {
-                tA.points += 3; tA.won++; tB.lost++;
-            } else if(sA < sB) {
-                tB.points += 3; tB.won++; tA.lost++;
-            } else {
-                tA.points += 1; tB.points += 1; tA.drawn++; tB.drawn++;
-            }
-        }
-
-        function advanceToKnockoutStage() {
-            currentStage = "R32";
-            let qualifiers = [];
-
-            groupLetters.forEach(letter => {
-                let gTeams = groups[letter].map(name => teams[name]);
-                gTeams.sort((a,b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf);
-                qualifiers.push(gTeams[0].name); 
-                qualifiers.push(gTeams[1].name); 
-                
-                // Set the rest to eliminated status
-                gTeams[2].eliminated = true; gTeams[2].stageReached = "Group Stage";
-                gTeams[3].eliminated = true; gTeams[3].stageReached = "Group Stage";
+            Object.keys(groups).sort().forEach(gName => {
+                let sorted = getSortedGroupTeams(gName);
+                survivors.push(sorted[0]);
+                survivors.push(sorted[1]);
+                thirdPlacePool.push(sorted[2]);
+                teams[sorted[3]].eliminated = true;
+                teams[sorted[3]].stageReached = 'Group Stage';
             });
 
-            // Fill empty slots to form standard 32 layout structure bracket
-            teamNames.forEach(tName => {
-                if(!qualifiers.includes(tName) && !teams[tName].eliminated) {
-                    qualifiers.push(tName);
+            thirdPlacePool.sort((a,b) => {
+                if (teams[b].points !== teams[a].points) return teams[b].points - teams[a].points;
+                if (teams[b].gd !== teams[a].gd) return teams[b].gd - teams[a].gd;
+                return teams[b].gf - teams[a].gf;
+            });
+
+            // Map wildcards
+            for (let i = 0; i < thirdPlacePool.length; i++) {
+                if (i < 8) survivors.push(thirdPlacePool[i]);
+                else {
+                    teams[thirdPlacePool[i]].eliminated = true;
+                    teams[thirdPlacePool[i]].stageReached = 'Group Stage';
                 }
-            });
+            }
 
-            buildPairingsFromArray(qualifiers);
+            // Shuffle array structure layout to form interesting matching brackets pairs
+            survivors = survivors.sort(() => Math.random() - 0.5);
+            buildPairingsFromArray(survivors);
+            knockoutHistoryTree[knockoutRoundName] = [...knockoutMatches];
+
+            if(teams[userTeam].eliminated) {
+                alert("Your team has been eliminated during the Group Stage. Entering Tournament Spectator Mode.");
+            }
         }
 
         function buildPairingsFromArray(arr) {
             knockoutMatches = [];
-            let shuffled = [...arr].sort(() => Math.random() - 0.5);
-            for(let i=0; i < shuffled.length; i += 2) {
+            for (let i = 0; i < arr.length; i += 2) {
                 knockoutMatches.push({
-                    home: shuffled[i],
-                    away: shuffled[i+1],
-                    scoreA: 0, scoreB: 0,
-                    played: false, winner: null, loser: null,
-                    stage: currentStage
+                    teamA: arr[i], teamB: arr[i+1],
+                    scoreA: 0, scoreB: 0, played: false, winner: null
                 });
             }
-            chosenNeutralMatchIdx = null; 
         }
 
-        function advanceKnockoutRoundStructure() {
-            let survivors = knockoutMatches.map(m => m.winner);
+        function resolveKnockoutRoundAdvancement() {
+            let unplayed = knockoutMatches.filter(m => !m.played);
+            if(unplayed.length > 0) return; 
 
-            if(knockoutMatches.length === 16) {
-                currentStage = "R16";
-                buildPairingsFromArray(survivors);
-            } else if(knockoutMatches.length === 8) {
-                currentStage = "QF";
-                buildPairingsFromArray(survivors);
-            } else if(knockoutMatches.length === 4) {
-                currentStage = "SF";
-                buildPairingsFromArray(survivors);
-            } else if(knockoutMatches.length === 2) {
-                currentStage = "Final";
-                buildPairingsFromArray(survivors);
-            } else if(knockoutMatches.length === 1) {
-                endTournament(knockoutMatches[0].winner);
+            let survivors = knockoutMatches.map(m => {
+                let loser = m.winner === m.teamA ? m.teamB : m.teamA;
+                teams[loser].eliminated = true;
+                teams[loser].stageReached = knockoutRoundName;
+                return m.winner;
+            });
+
+            if (knockoutRoundName === 'Final') {
+                return endTournament(knockoutMatches[0].winner);
+            }
+
+            if (survivors.length === 16) knockoutRoundName = 'Round of 16';
+            else if (survivors.length === 8) knockoutRoundName = 'Quarterfinals';
+            else if (survivors.length === 4) knockoutRoundName = 'Semifinals';
+            else if (survivors.length === 2) knockoutRoundName = 'Final';
+
+            buildPairingsFromArray(survivors);
+            knockoutHistoryTree[knockoutRoundName] = [...knockoutMatches];
+
+            if(teams[userTeam].eliminated) {
+                alert(`Knockout segment wrapped up. Advancing to the next tier: ${knockoutRoundName}`);
             }
         }
 
