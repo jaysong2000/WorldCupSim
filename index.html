@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 World Cup 2026 Manager Pro</title>
+    <title>🏆 World Cup 2026 Manager</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -616,11 +616,11 @@
 
                 <div class="live-power-container">
                     <div class="live-power-col" id="live-power-home-box">
-                        <strong id="live-label-home">Home Power Ratings</strong>
+                        <strong id="live-label-home">Team Power Ratings</strong>
                         <div id="live-power-home-text" style="margin-top:5px; line-height:1.4;"></div>
                     </div>
                     <div class="live-power-col" id="live-power-away-box">
-                        <strong id="live-label-away">Away Power Ratings</strong>
+                        <strong id="live-label-away">Team Power Ratings</strong>
                         <div id="live-power-away-text" style="margin-top:5px; line-height:1.4;"></div>
                     </div>
                 </div>
@@ -640,14 +640,14 @@
 
                 <div class="team-sheets-grid">
                     <div class="sheet-box" id="match-sheet-home">
-                        <div class="sheet-title" id="sheet-title-home">Home Country</div>
+                        <div class="sheet-title" id="sheet-title-home">Country</div>
                         <div class="sheet-section-label">On Pitch</div>
                         <div id="sheet-pitch-home"></div>
                         <div class="sheet-section-label">Bench</div>
                         <div id="sheet-bench-home"></div>
                     </div>
                     <div class="sheet-box" id="match-sheet-away">
-                        <div class="sheet-title" id="sheet-title-away">Away Country</div>
+                        <div class="sheet-title" id="sheet-title-away">Country</div>
                         <div class="sheet-section-label">On Pitch</div>
                         <div id="sheet-pitch-away"></div>
                         <div class="sheet-section-label">Bench</div>
@@ -933,7 +933,7 @@
                 document.getElementById('dash-stage-info').innerText = `Group Stage - Round ${currentRound} of 3 | Group ${teams[userTeam].group}`;
                 let match = getGroupFixtureForRound(teams[userTeam].group, userTeam, currentRound);
                 let opp = (match.home === userTeam) ? match.away : match.home;
-                document.getElementById('next-opponent').innerText = `${opp} (${match.home === userTeam ? 'Home' : 'Away'})`;
+                document.getElementById('next-opponent').innerText = `${opp} (${match.home === userTeam ? '' : ''})`;
             } else {
                 document.getElementById('dash-stage-info').innerText = `Knockout Phase - ${knockoutRoundName}`;
                 let uMatch = knockoutMatches.find(m => m.teamA === userTeam || m.teamB === userTeam);
@@ -1513,7 +1513,7 @@
                 isHalftimeBreak = true;
                 clearInterval(matchIntervalTimer);
                 
-                appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Teams retreat to locker rooms for tactical briefing.");
+                appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Press Continue to resume.");
                 
                 activeMatchSimulation.sideFixtures.forEach(f => runAIReactiveSubs(f, true));
                 runAIReactiveSubs({ home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed }, true);
@@ -1569,7 +1569,7 @@
             if (!activeMatchSimulation.extraTime && simMinute === 90) {
                 if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
                     activeMatchSimulation.extraTime = true;
-                    appendCommentaryLine(90, "INFO", "⏱️ FULL TIME TIE! Proceeding directly into Extra Time stages.");
+                    appendCommentaryLine(90, "INFO", "⏱️ FULL TIME - EXTRA TIME");
                 } else {
                     concludeActiveSimulationRun();
                 }
@@ -1582,15 +1582,26 @@
             }
         }
 
-        function initiatePenaltyShootoutSequence() {
+       function initiatePenaltyShootoutSequence() {
             activeMatchSimulation.penalties = true;
             document.getElementById('match-clock').innerText = "PENS";
             document.getElementById('match-pause-btn').disabled = true;
             
-            appendCommentaryLine(120, "INFO", "🏆 STALEMATE AFTER EXTRA TIME! Match to be decided via structural penalty kicks.");
+            appendCommentaryLine(120, "INFO", "🏆 AET DRAW! Entering Penalties.");
 
-            activeMatchSimulation.penHomeTakers = [...activeMatchSimulation.homeLineup];
-            activeMatchSimulation.penAwayTakers = [...activeMatchSimulation.awayLineup];
+            // Helper to sort players by position priority: FW -> MF -> DF -> GK
+            const positionPriority = { 'FW': 1, 'MF': 2, 'DF': 3, 'GK': 4 };
+            const getSortedTakersArray = (teamName, lineupArray) => {
+                let teamObj = teams[teamName];
+                return [...lineupArray]
+                    .map(name => teamObj.players.find(p => p.FullName === name))
+                    .filter(Boolean) // Avoid undefined issues
+                    .sort((a, b) => (positionPriority[a.Position] || 99) - (positionPriority[b.Position] || 99))
+                    .map(p => p.FullName);
+            };
+
+            activeMatchSimulation.penHomeTakers = getSortedTakersArray(activeMatchSimulation.home, activeMatchSimulation.homeLineup);
+            activeMatchSimulation.penAwayTakers = getSortedTakersArray(activeMatchSimulation.away, activeMatchSimulation.awayLineup);
 
             activeMatchSimulation.sideFixtures.forEach(f => {
                 if (f.hScore === f.aScore) {
@@ -1649,9 +1660,9 @@
                 
                 if (converted) {
                     activeMatchSimulation.penHomeScored++;
-                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.home}] ${takerName} converts calmly into the corner.`);
+                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.home}] ${takerName}`);
                 } else {
-                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.home}] ${takerName}'s shot is blocked or flies wide!`);
+                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.home}] ${takerName}`);
                 }
             } else {
                 let takerName = activeMatchSimulation.penAwayTakers[aK % activeMatchSimulation.penAwayTakers.length];
@@ -1666,9 +1677,9 @@
 
                 if (converted) {
                     activeMatchSimulation.penAwayScored++;
-                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.away}] ${takerName} executes the penalty perfectly.`);
+                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.away}] ${takerName}`);
                 } else {
-                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.away}] ${takerName} cracks under pressure!`);
+                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.away}] ${takerName}`);
                 }
             }
 
@@ -1753,8 +1764,8 @@
             if (side === 'H') matchObjRef.hScore++; else matchObjRef.aScore++;
 
             if (isFeaturedGame) {
-                let log = `⚽ GOAL! ${scorer.FullName} powers it into the net!`;
-                if (assister) log += ` Beautifully assisted by ${assister.FullName}.`;
+                let log = `⚽ GOAL! ${scorer.FullName}!`;
+                if (assister) log += ` assisted by ${assister.FullName}.`;
                 log += ` (${attackerTeam})`;
                 appendCommentaryLine(simMinute, "goal", log);
             }
@@ -1797,7 +1808,7 @@
                     updateSubCountCallback(currentSubsCount);
                     
                     if (countryName === activeMatchSimulation.home || countryName === activeMatchSimulation.away) {
-                        appendCommentaryLine(simMinute, "INFO", `🔄 Tactical AI Sub (${countryName}): ${outgoing.FullName} off ➔ ${incoming.FullName} on.`);
+                        appendCommentaryLine(simMinute, "INFO", `🔄 Sub (${countryName}): ${outgoing.FullName} off ➔ ${incoming.FullName} on.`);
                     }
                 }
             }
