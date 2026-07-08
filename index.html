@@ -1779,40 +1779,57 @@
             if (aName !== userTeam) executeSingleAIReactiveSub(aName, f.aLineup, f.aSubsUsed, f.aScore, f.hScore, isHalftime, count => f.aSubsUsed = count);
         }
 
-        function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
-            if (currentSubsCount >= MaxUserSubs) return;
+       function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
+    if (currentSubsCount >= MaxUserSubs) return;
 
-            let team = teams[countryName];
-            let shouldSubstitute = isHalftime || (teamScore < opponentScore && Math.random() < 0.45) || Math.random() < 0.15;
-            if (!shouldSubstitute) return;
+    let team = teams[countryName];
+    
+    // Initialize stoppage window counter for this team if it doesn't exist
+    if (team.subStoppagesUsed === undefined) {
+        team.subStoppagesUsed = 0;
+    }
 
-            let bench = team.players.filter(p => !activeLineup.includes(p.FullName) && !p.Suspended && p.injuryDurationLeft <= 0 && p.injurySeverity !== 'tournament' && p.matchStatus !== 'subbed-off');
-            if (bench.length === 0) return;
+    // CAP: Enforce a maximum of 3 separate substitution windows/stoppages (excluding Halftime)
+    if (!isHalftime && team.subStoppagesUsed >= 3) return;
 
-            let outfieldOnPitch = team.players.filter(p => activeLineup.includes(p.FullName) && p.Position !== 'GK');
-            if (outfieldOnPitch.length === 0) return;
+    let shouldSubstitute = isHalftime || (teamScore < opponentScore && Math.random() < 0.45) || Math.random() < 0.15;
+    if (!shouldSubstitute) return;
 
-            outfieldOnPitch.sort((a,b) => (a.inMatchInjured ? -100 : 0) + (a.Fatigue - b.Fatigue) + (getEffectiveAbility(a) - getEffectiveAbility(b)));
-            let outgoing = outfieldOnPitch[0];
+    // Filter bench to find available players
+    let bench = team.players.filter(p => !activeLineup.includes(p.FullName) && !p.Suspended && p.injuryDurationLeft <= 0 && p.injurySeverity !== 'tournament' && p.matchStatus !== 'subbed-off');
+    if (bench.length === 0) return;
 
-            let idealPosition = (teamScore < opponentScore) ? 'FW' : outgoing.Position;
-            let incoming = bench.find(p => p.Position === idealPosition) || bench.find(p => p.Position === 'MF') || bench[0];
+    // CRITICAL FIX: Outfield on pitch must NOT include players who were already subbed on earlier
+    let outfieldOnPitch = team.players.filter(p => activeLineup.includes(p.FullName) && p.Position !== 'GK' && p.matchStatus !== 'subbed-on');
+    if (outfieldOnPitch.length === 0) return;
 
-            if (incoming && incoming.Position !== 'GK') {
-                let idx = activeLineup.indexOf(outgoing.FullName);
-                if (idx > -1) {
-                    activeLineup[idx] = incoming.FullName;
-                    outgoing.matchStatus = 'subbed-off';
-                    incoming.matchStatus = 'subbed-on';
-                    currentSubsCount++;
-                    updateSubCountCallback(currentSubsCount);
-                    
-                    if (countryName === activeMatchSimulation.home || countryName === activeMatchSimulation.away) {
-                        appendCommentaryLine(simMinute, "INFO", `🔄 Sub (${countryName}): ${outgoing.FullName} off ➔ ${incoming.FullName} on.`);
-                    }
-                }
+    outfieldOnPitch.sort((a,b) => (a.inMatchInjured ? -100 : 0) + (a.Fatigue - b.Fatigue) + (getEffectiveAbility(a) - getEffectiveAbility(b)));
+    let outgoing = outfieldOnPitch[0];
+
+    let idealPosition = (teamScore < opponentScore) ? 'FW' : outgoing.Position;
+    let incoming = bench.find(p => p.Position === idealPosition) || bench.find(p => p.Position === 'MF') || bench[0];
+
+    if (incoming && incoming.Position !== 'GK') {
+        let idx = activeLineup.indexOf(outgoing.FullName);
+        if (idx > -1) {
+            activeLineup[idx] = incoming.FullName;
+            outgoing.matchStatus = 'subbed-off';
+            incoming.matchStatus = 'subbed-on'; // Flags player so they cannot be targeted for removal later
+            
+            currentSubsCount++;
+            updateSubCountCallback(currentSubsCount);
+
+            // If this substitution occurs during active play (not halftime), register it as a consumed stoppage window
+            if (!isHalftime) {
+                team.subStoppagesUsed++;
+            }
+            
+            if (countryName === activeMatchSimulation.home || countryName === activeMatchSimulation.away) {
+                appendCommentaryLine(simMinute, "INFO", `🔄 Sub (${countryName}): ${outgoing.FullName} off ➔ ${incoming.FullName} on.`);
             }
         }
+    }
+}
 
         function processInjuriesRngCheck(countryName, activeLineupArray, sideFlag, isSideMatch = false, sideMatchObj = null) {
             if (Math.random() > 0.0022) return; 
