@@ -1467,7 +1467,16 @@
 
             let team = teams[countryName];
             
-            team.players.forEach(p => {
+            // Define position priority order: GK -> DF -> MF -> FW
+            const positionPriority = { 'GK': 1, 'DF': 2, 'MF': 3, 'FW': 4 };
+
+            // Create a sorted copy of the players array based on position priority
+            let sortedPlayers = [...team.players].sort((a, b) => {
+                return (positionPriority[a.Position] || 99) - (positionPriority[b.Position] || 99);
+            });
+            
+            // Loop through the sorted list instead of the default order
+            sortedPlayers.forEach(p => {
                 let isOnPitch = lineupArray.includes(p.FullName);
                 let row = document.createElement('div');
                 row.className = 'sheet-row';
@@ -1792,7 +1801,7 @@
     // CAP: Enforce a maximum of 3 separate substitution windows/stoppages (excluding Halftime)
     if (!isHalftime && team.subStoppagesUsed >= 3) return;
 
-    let shouldSubstitute = isHalftime || (teamScore < opponentScore && Math.random() < 0.45) || Math.random() < 0.15;
+    let shouldSubstitute = (teamScore < opponentScore) || Math.random() < 0.15;
     if (!shouldSubstitute) return;
 
     // Filter bench to find available players
