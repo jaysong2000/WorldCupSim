@@ -311,6 +311,43 @@
 
         .side-results { max-height: 180px; overflow-y: auto; font-size: 0.85rem; }
 
+        .team-sheets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .sheet-box {
+            background: #181818;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .sheet-title {
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 4px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .sheet-section-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin: 8px 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sheet-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            padding: 4px 0;
+            border-bottom: 1px solid #252525;
+        }
+
         .bracket-scroll-container {
             overflow-x: auto;
             padding: 20px 0;
@@ -358,7 +395,7 @@
             background: #1e1e1e;
             border-radius: 8px;
             width: 90%;
-            max-width: 600px;
+            max-width: 650px;
             padding: 20px;
             max-height: 85vh;
             overflow-y: auto;
@@ -486,10 +523,10 @@
 
                         <div id="tab-standings" class="tab-content active">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h4 style="margin: 0;">Group Standings</h4>
+                                <h4 style="margin: 0;">Group Standings View</h4>
                                 <select id="group-view-select" style="background: #2a2a2a; color: white; padding: 5px; border-radius: 4px; border: 1px solid #444;" onchange="renderStandingsTable()"></select>
                             </div>
-                            <div style="overflow-x: auto;">
+                            <div style="overflow-x: auto; margin-bottom: 25px;">
                                 <table>
                                     <thead>
                                         <tr>
@@ -499,6 +536,8 @@
                                             <th>W</th>
                                             <th>D</th>
                                             <th>L</th>
+                                            <th>GF</th>
+                                            <th>GA</th>
                                             <th>GD</th>
                                             <th>Pts</th>
                                         </tr>
@@ -506,9 +545,27 @@
                                     <tbody id="standings-table-body"></tbody>
                                 </table>
                             </div>
-                            <div id="standings-legend-note" style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
-                                <span style="display:inline-block; width:10px; height:10px; background:rgba(46,125,50,0.25); margin-right:4px; vertical-align:middle;"></span> Top 2 Auto-Advance 
-                                <span style="display:inline-block; width:10px; height:10px; background:rgba(251,192,45,0.15); margin-right:4px; margin-left:10px; vertical-align:middle;"></span> Best 3rd-Place Candidates
+
+                            <h4 style="margin: 15px 0 5px 0; color: var(--gold);">🃏 Best 3rd-Place Teams Tracker</h4>
+                            <div style="overflow-x: auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Team</th>
+                                            <th>Grp</th>
+                                            <th>P</th>
+                                            <th>W</th>
+                                            <th>D</th>
+                                            <th>L</th>
+                                            <th>GF</th>
+                                            <th>GA</th>
+                                            <th>GD</th>
+                                            <th>Pts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="thirds-table-body"></tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -516,28 +573,21 @@
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div>
                                     <h4 style="color: var(--fw-color); margin: 5px 0;">⚽ Top Scorers</h4>
-                                    <div style="max-height: 200px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
+                                    <div style="max-height: 250px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
                                         <table style="margin:0;"><tbody id="leaderboard-goals"></tbody></table>
                                     </div>
                                 </div>
                                 <div>
                                     <h4 style="color: var(--mf-color); margin: 5px 0;">🎯 Top Assists</h4>
-                                    <div style="max-height: 200px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
+                                    <div style="max-height: 250px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
                                         <table style="margin:0;"><tbody id="leaderboard-assists"></tbody></table>
                                     </div>
-                                </div>
-                            </div>
-                            <div style="margin-top: 15px;">
-                                <h4 style="color: var(--gk-color); margin: 5px 0;">🧤 Goalkeeper Clean Sheets</h4>
-                                <div style="max-height: 150px; overflow-y:auto; font-size:0.8rem; background:#151515; padding:5px; border-radius:4px;">
-                                    <table style="margin:0;"><tbody id="leaderboard-cleansheets"></tbody></table>
                                 </div>
                             </div>
                         </div>
 
                         <div id="tab-bracket" class="tab-content">
                             <h4>Tournament Bracket Tree</h4>
-                            <p style="font-size:0.75rem; color:var(--text-muted);">Scroll horizontally to view matchups tracking across knockout rounds.</p>
                             <div class="bracket-scroll-container">
                                 <div class="bracket-wrapper" id="bracket-tree-root">
                                     <div style="color:var(--text-muted); font-size:0.85rem; padding:20px;">Knockout tree is drafted once the Group Stage concludes.</div>
@@ -582,12 +632,30 @@
 
                 <div style="text-align: center; margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
                     <button class="btn" id="match-pause-btn" style="background:#d32f2f;" onclick="triggerTacticalPause()">⏸️ Tactical Pause & Subs</button>
-                    <button class="btn" id="match-halftime-btn" style="background:var(--gold); color: black; display: none;" onclick="triggerHalftimeBoard()">🔄 Half-time Team Selection</button>
+                    <button class="btn" id="match-halftime-btn" style="background:var(--gold); color: black; display: none;" onclick="triggerHalftimeBoard()">🔄 Half-time Adjustments</button>
+                    <button class="btn" id="match-resume-ht-btn" style="background:var(--accent-color); color: white; display: none;" onclick="resumeFromHalftimeBreak()">▶️ Resume Second Half</button>
                 </div>
 
                 <div class="commentary-box" id="match-commentary"></div>
 
-                <div style="text-align: center; margin-bottom: 15px; display:flex; justify-content:center; gap:10px;">
+                <div class="team-sheets-grid">
+                    <div class="sheet-box" id="match-sheet-home">
+                        <div class="sheet-title" id="sheet-title-home">Home Country</div>
+                        <div class="sheet-section-label">On Pitch</div>
+                        <div id="sheet-pitch-home"></div>
+                        <div class="sheet-section-label">Bench</div>
+                        <div id="sheet-bench-home"></div>
+                    </div>
+                    <div class="sheet-box" id="match-sheet-away">
+                        <div class="sheet-title" id="sheet-title-away">Away Country</div>
+                        <div class="sheet-section-label">On Pitch</div>
+                        <div id="sheet-pitch-away"></div>
+                        <div class="sheet-section-label">Bench</div>
+                        <div id="sheet-bench-away"></div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px; margin-bottom: 15px; display:flex; justify-content:center; gap:10px;">
                     <button class="btn" id="match-skip-btn" onclick="skipMatchAnimation()">⚡ Instant Results</button>
                     <button class="btn" id="match-continue-btn" style="display:none;" onclick="finishMatchDay()">Return to Dashboard</button>
                 </div>
@@ -725,7 +793,8 @@
                     Goals: 0,
                     Assists: 0,
                     CleanSheets: 0,
-                    isInjured: false
+                    isInjured: false,
+                    matchStatus: 'bench'
                 };
                 playersRaw.push(player);
 
@@ -868,7 +937,7 @@
                     let opp = (uMatch.teamA === userTeam) ? uMatch.teamB : uMatch.teamA;
                     document.getElementById('next-opponent').innerText = uMatch.played ? "Concluded" : opp;
                 } else {
-                    document.getElementById('next-opponent').innerText = "Eliminated Viewer Model";
+                    document.getElementById('next-opponent').innerText = "Eliminated";
                 }
             }
 
@@ -1045,51 +1114,72 @@
             return list;
         }
 
+        function getCalculatedThirdsList() {
+            let thirds = [];
+            Object.keys(groups).sort().forEach(gName => {
+                let sorted = getSortedGroupTeams(gName);
+                if (sorted[2]) thirds.push(sorted[2]);
+            });
+            thirds.sort((a,b) => {
+                let tA = teams[a]; let tB = teams[b];
+                if (tB.points !== tA.points) return tB.points - tA.points;
+                if (tB.gd !== tA.gd) return tB.gd - tA.gd;
+                return tB.gf - tA.gf;
+            });
+            return thirds;
+        }
+
         function renderStandingsTable() {
             let select = document.getElementById('group-view-select');
             let selectedGroup = select.value || teams[userTeam].group;
             let tbody = document.getElementById('standings-table-body');
             tbody.innerHTML = '';
 
-            if (currentStage === 'Group Stage') {
-                document.getElementById('standings-legend-note').style.display = "block";
-                let sortedTeams = getSortedGroupTeams(selectedGroup);
-                sortedTeams.forEach((tName, index) => {
-                    let t = teams[tName];
-                    let row = document.createElement('tr');
-                    if (index < 2) row.className = 'advance-zone';
-                    else if (index === 2) row.className = 'best-third-zone';
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName === userTeam ? '⭐ ' : ''}${tName}</td>
-                        <td>${t.won + t.drawn + t.lost}</td>
-                        <td>${t.won}</td>
-                        <td>${t.drawn}</td>
-                        <td>${t.lost}</td>
-                        <td>${t.gd > 0 ? '+' : ''}${t.gd}</td>
-                        <td style="font-weight:bold; color:var(--gold);">${t.points}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } else {
-                document.getElementById('standings-legend-note').style.display = "none";
-                Object.keys(teams).sort().forEach((tName, idx) => {
-                    let t = teams[tName];
-                    let row = document.createElement('tr');
-                    if(!t.eliminated) row.className = 'advance-zone';
-                    row.innerHTML = `
-                        <td>${idx+1}</td>
-                        <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName}</td>
-                        <td>${t.won+t.drawn+t.lost}</td>
-                        <td>${t.won}</td>
-                        <td>${t.drawn}</td>
-                        <td>${t.lost}</td>
-                        <td>${t.gd}</td>
-                        <td>${t.stageReached}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
+            let sortedTeams = getSortedGroupTeams(selectedGroup);
+            sortedTeams.forEach((tName, index) => {
+                let t = teams[tName];
+                let row = document.createElement('tr');
+                if (index < 2) row.className = 'advance-zone';
+                else if (index === 2) row.className = 'best-third-zone';
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName === userTeam ? '⭐ ' : ''}${tName}</td>
+                    <td>${t.won + t.drawn + t.lost}</td>
+                    <td>${t.won}</td>
+                    <td>${t.drawn}</td>
+                    <td>${t.lost}</td>
+                    <td>${t.gf}</td>
+                    <td>${t.ga}</td>
+                    <td>${t.gd > 0 ? '+' : ''}${t.gd}</td>
+                    <td style="font-weight:bold; color:var(--gold);">${t.points}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Handle the 3rd place lookup matrix view
+            let thirdsBody = document.getElementById('thirds-table-body');
+            thirdsBody.innerHTML = '';
+            let sortedThirds = getCalculatedThirdsList();
+
+            sortedThirds.forEach((tName, index) => {
+                let t = teams[tName];
+                let row = document.createElement('tr');
+                if (index < 8) row.className = 'advance-zone';
+                row.innerHTML = `
+                    <td>${index + 1} ${index < 8 ? '✅' : '❌'}</td>
+                    <td style="font-weight:${tName === userTeam ? 'bold' : 'normal'}">${tName}</td>
+                    <td style="color:var(--gold); font-weight:bold;">${t.group}</td>
+                    <td>${t.won + t.drawn + t.lost}</td>
+                    <td>${t.won}</td>
+                    <td>${t.drawn}</td>
+                    <td>${t.lost}</td>
+                    <td>${t.gf}</td>
+                    <td>${t.ga}</td>
+                    <td>${t.gd > 0 ? '+' : ''}${t.gd}</td>
+                    <td style="font-weight:bold; color:var(--gold);">${t.points}</td>
+                `;
+                thirdsBody.appendChild(row);
+            });
         }
 
         function renderLeaderboards() {
@@ -1098,17 +1188,13 @@
                 teams[c].players.forEach(p => allPlayers.push(p));
             });
 
-            let scorers = [...allPlayers].sort((a,b) => b.Goals - a.Goals || b.BaseAbility - a.BaseAbility).slice(0, 10);
+            let scorers = [...allPlayers].sort((a,b) => b.Goals - a.Goals || b.BaseAbility - a.BaseAbility).slice(0, 15);
             let boxG = document.getElementById('leaderboard-goals');
             boxG.innerHTML = scorers.map(p => `<tr><td><strong>${p.FullName}</strong><br><span style="color:#888; font-size:0.7rem;">${p.Country}</span></td><td style="text-align:right; font-weight:bold; color:var(--fw-color);">${p.Goals} G</td></tr>`).join('');
 
-            let playmakers = [...allPlayers].sort((a,b) => b.Assists - a.Assists || b.BaseAbility - a.BaseAbility).slice(0, 10);
+            let playmakers = [...allPlayers].sort((a,b) => b.Assists - a.Assists || b.BaseAbility - a.BaseAbility).slice(0, 15);
             let boxA = document.getElementById('leaderboard-assists');
             boxA.innerHTML = playmakers.map(p => `<tr><td><strong>${p.FullName}</strong><br><span style="color:#888; font-size:0.7rem;">${p.Country}</span></td><td style="text-align:right; font-weight:bold; color:var(--mf-color);">${p.Assists} A</td></tr>`).join('');
-
-            let keepers = [...allPlayers].filter(p => p.Position === 'GK').sort((a,b) => b.CleanSheets - a.CleanSheets || b.BaseAbility - a.BaseAbility).slice(0, 5);
-            let boxCS = document.getElementById('leaderboard-cleansheets');
-            boxCS.innerHTML = keepers.map(p => `<tr><td><strong>${p.FullName}</strong> (${p.Country})</td><td style="text-align:right; font-weight:bold; color:var(--gk-color);">${p.CleanSheets} CS</td></tr>`).join('');
         }
 
         function renderBracketTree() {
@@ -1133,13 +1219,6 @@
                 h.style.margin = "0 0 10px 0"; h.style.textAlign = "center"; h.style.color = "var(--gold)";
                 h.innerText = rKey;
                 roundCol.appendChild(h);
-
-                if(matches.length === 0) {
-                    let empty = document.createElement('div');
-                    empty.style.color = '#555'; empty.style.fontSize = '0.75rem'; empty.style.textAlign = 'center';
-                    empty.innerText = 'TBD';
-                    roundCol.appendChild(empty);
-                }
 
                 matches.forEach(m => {
                     let node = document.createElement('bracket-match-node');
@@ -1170,6 +1249,7 @@
             savedDayResults = [];
             isHalftimeBreak = false;
             document.getElementById('match-halftime-btn').style.display = "none";
+            document.getElementById('match-resume-ht-btn').style.display = "none";
             document.getElementById('match-pause-btn').style.display = "inline-block";
 
             if (currentStage === 'Group Stage') {
@@ -1197,7 +1277,6 @@
                 }
 
                 let secondary = matchesToSim.filter(m => m !== primary);
-                
                 setupActiveSimulationEngine(primary.home, primary.away, secondary);
             } else {
                 let userMatch = knockoutMatches.find(m => !m.played && (m.teamA === userTeam || m.teamB === userTeam));
@@ -1205,9 +1284,7 @@
                     userMatch = knockoutMatches.find(m => !m.played);
                 }
 
-                if (!userMatch) {
-                    return advanceKnockoutRoundLayout();
-                }
+                if (!userMatch) return advanceKnockoutRoundLayout();
 
                 let secondary = knockoutMatches.filter(m => m !== userMatch && !m.played);
                 setupActiveSimulationEngine(userMatch.teamA, userMatch.teamB, secondary, true);
@@ -1222,6 +1299,9 @@
             document.getElementById('match-live-score').innerText = "0 - 0";
             document.getElementById('match-clock').innerText = "00:00";
             
+            document.getElementById('sheet-title-home').innerText = homeName;
+            document.getElementById('sheet-title-away').innerText = awayName;
+
             let commBox = document.getElementById('match-commentary');
             commBox.innerHTML = `<div class="commentary-line info">Welcome to the stadium. Teams are emerging onto the pitch...</div>`;
             
@@ -1248,6 +1328,23 @@
                 allEventsTimeline: {}
             };
 
+            setupMatchStatusesForTeam(homeName, activeMatchSimulation.homeLineup);
+            setupMatchStatusesForTeam(awayName, activeMatchSimulation.awayLineup);
+
+            activeMatchSimulation.sideFixtures.forEach(f => {
+                let hN = f.home || f.teamA;
+                let aN = f.away || f.teamB;
+                f.hScore = 0;
+                f.aScore = 0;
+                f.hSubsUsed = 0;
+                f.aSubsUsed = 0;
+                f.hLineup = [...teams[hN].selectedLineupIds];
+                f.aLineup = [...teams[aN].selectedLineupIds];
+                
+                setupMatchStatusesForTeam(hN, f.hLineup);
+                setupMatchStatusesForTeam(aN, f.aLineup);
+            });
+
             if (homeName === userTeam) {
                 document.getElementById('user-subs-count').innerText = `${activeMatchSimulation.homeSubsUsed} / ${MaxUserSubs}`;
                 document.getElementById('user-pauses-count').innerText = `${MaxUserPauses - activeMatchSimulation.homePausesUsed} / ${MaxUserPauses}`;
@@ -1259,49 +1356,35 @@
                 document.getElementById('user-pauses-count').innerText = "N/A (Viewer)";
             }
 
-            preCalculateSideMatchesInitialLayout();
             updateLivePowerDisplayGrid();
+            renderLiveTeamSheets();
+            renderSideLiveMatchesList();
 
             simMinute = 0;
             isSimPaused = false;
             
             clearInterval(matchIntervalTimer);
-            matchIntervalTimer = setInterval(tickSimulationMinute, 200);
+            matchIntervalTimer = setInterval(tickSimulationMinute, 150);
         }
 
-        function preCalculateSideMatchesInitialLayout() {
-            activeMatchSimulation.sideFixtures.forEach(f => {
-                let hName = f.home || f.teamA;
-                let aName = f.away || f.teamB;
-                
-                let hP = calculateLiveLineupPowers(teams[hName], teams[hName].selectedLineupIds);
-                let aP = calculateLiveLineupPowers(teams[aName], teams[aName].selectedLineupIds);
-                
-                f.hScore = 0; f.aScore = 0; f.played = false;
-                f.timelineEvents = {};
-
-                let maxMins = activeMatchSimulation.isKnockout ? 120 : 90;
-                for (let m = 1; m <= maxMins; m++) {
-                    if (Math.random() < 0.05) {
-                        let attackFactor = (m <= 45 || (m > 90 && m <= 105)) ? 1.0 : 1.05;
-                        let homeChance = (hP.fw + hP.mf/2) * attackFactor;
-                        let awayChance = (aP.fw + aP.mf/2) * attackFactor;
-                        let homeDef = hP.df + hP.gk;
-                        let awayDef = aP.df + aP.gk;
-
-                        let homeScoreProb = (homeChance / (homeChance + awayDef)) * 0.14;
-                        let awayScoreProb = (awayChance / (awayChance + homeDef)) * 0.14;
-
-                        let rng = Math.random();
-                        if (rng < homeScoreProb) {
-                            f.timelineEvents[m] = { type: 'GOAL', side: 'H' };
-                        } else if (rng < homeScoreProb + awayScoreProb) {
-                            f.timelineEvents[m] = { type: 'GOAL', side: 'A' };
-                        }
-                    }
-                }
+        function setupMatchStatusesForTeam(countryName, activeLineup) {
+            teams[countryName].players.forEach(p => {
+                p.matchStatus = activeLineup.includes(p.FullName) ? 'started' : 'bench';
             });
-            renderSideLiveMatchesList();
+        }
+
+        function triggerHalftimeBoard() {
+            let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
+            if (!isUserInvolved || teams[userTeam].eliminated) return;
+
+            let modal = document.getElementById('sub-modal-overlay');
+            modal.classList.add('active');
+            
+            document.getElementById('sub-modal-title').innerText = "🔄 Half-time Tactical Adjustments Board";
+            document.getElementById('sub-modal-desc').innerText = "Adjust your squad for the second half. Changes count towards the 5-substitution limit.";
+            document.getElementById('modal-cancel-btn').style.display = "inline-block";
+
+            renderSubstitutionModalLists();
         }
 
         function renderSideLiveMatchesList() {
@@ -1343,11 +1426,52 @@
             `;
         }
 
+        function renderLiveTeamSheets() {
+            renderSingleTeamSheet(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'home');
+            renderSingleTeamSheet(activeMatchSimulation.away, activeMatchSimulation.awayLineup, 'away');
+        }
+
+        function renderSingleTeamSheet(countryName, lineupArray, selectorPrefix) {
+            let pitchBox = document.getElementById(`sheet-pitch-${selectorPrefix}`);
+            let benchBox = document.getElementById(`sheet-bench-${selectorPrefix}`);
+            pitchBox.innerHTML = '';
+            benchBox.innerHTML = '';
+
+            let team = teams[countryName];
+            
+            team.players.forEach(p => {
+                let isOnPitch = lineupArray.includes(p.FullName);
+                let row = document.createElement('div');
+                row.className = 'sheet-row';
+
+                let indicators = [];
+                if (p.isInjured) indicators.push('🚑 Injured');
+                if (p.Suspended) indicators.push('🟥 Suspended');
+                if (p.matchStatus === 'started') indicators.push('🏃');
+                if (p.matchStatus === 'subbed-on') indicators.push('🔄 On');
+                if (p.matchStatus === 'subbed-off') indicators.push('🔄 Off');
+                if (p.Goals > 0) indicators.push(`⚽x${p.Goals}`);
+
+                let indicatorStr = indicators.length > 0 ? ` [${indicators.join(' ')}]` : '';
+                let effAbility = getEffectiveAbility(p);
+
+                row.innerHTML = `
+                    <span><span class="pos-badge pos-${p.Position}">${p.Position}</span> ${p.FullName}${indicatorStr}</span>
+                    <span style="color:var(--gold);">Rating: ${effAbility}</span>
+                `;
+
+                if (isOnPitch) {
+                    pitchBox.appendChild(row);
+                } else {
+                    benchBox.appendChild(row);
+                }
+            });
+        }
+
         function tickSimulationMinute() {
             if (isSimPaused) return;
 
             simMinute++;
-            let maxNormalMinute = 90;
             
             if (simMinute === 45 && !isHalftimeBreak) {
                 isSimPaused = true;
@@ -1356,17 +1480,20 @@
                 
                 appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Teams retreat to locker rooms for tactical briefing.");
                 
+                activeMatchSimulation.sideFixtures.forEach(f => runAIReactiveSubs(f, true));
+                runAIReactiveSubs({ home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed }, true);
+
                 let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
                 if (isUserInvolved && !teams[userTeam].eliminated) {
                     document.getElementById('match-pause-btn').style.display = "none";
                     document.getElementById('match-halftime-btn').style.display = "inline-block";
-                    appendCommentaryLine(45, "INFO", "Half-time interval active. You can now execute strategic adjustments without spending substitution slot entries.");
+                    document.getElementById('match-resume-ht-btn').style.display = "inline-block";
                 } else {
                     setTimeout(() => {
                         isSimPaused = false;
                         isHalftimeBreak = false;
-                        matchIntervalTimer = setInterval(tickSimulationMinute, 200);
-                    }, 1200);
+                        matchIntervalTimer = setInterval(tickSimulationMinute, 150);
+                    }, 1000);
                 }
                 return;
             }
@@ -1374,41 +1501,32 @@
             let clockText = (simMinute < 10 ? '0' : '') + simMinute + ':00';
             document.getElementById('match-clock').innerText = clockText;
 
-            activeMatchSimulation.sideFixtures.forEach(f => {
-                if (f.timelineEvents[simMinute]) {
-                    let ev = f.timelineEvents[simMinute];
-                    if (ev.type === 'GOAL') {
-                        if (ev.side === 'H') f.hScore++; else f.aScore++;
-                    }
-                }
-            });
-            renderSideLiveMatchesList();
-
             processInjuriesRngCheck(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'H');
             processInjuriesRngCheck(activeMatchSimulation.away, activeMatchSimulation.awayLineup, 'A');
-
-            let hName = activeMatchSimulation.home;
-            let aName = activeMatchSimulation.away;
-            let hP = calculateLiveLineupPowers(teams[hName], activeMatchSimulation.homeLineup);
-            let aP = calculateLiveLineupPowers(teams[aName], activeMatchSimulation.awayLineup);
-
-            if (Math.random() < 0.05) {
-                let phaseBonus = (simMinute <= 45 || (simMinute > 90 && simMinute <= 105)) ? 1.0 : 1.05;
-                let homeChance = (hP.fw + hP.mf / 2) * phaseBonus;
-                let awayChance = (aP.fw + aP.mf / 2) * phaseBonus;
-                let homeDef = hP.df + hP.gk;
-                let awayDef = aP.df + aP.gk;
-
-                let homeScoreProb = (homeChance / (homeChance + awayDef)) * 0.14;
-                let awayScoreProb = (awayChance / (awayChance + homeDef)) * 0.14;
-
-                let rng = Math.random();
-                if (rng < homeScoreProb) {
-                    executeGoalScoredLogic(hName, aName, 'H');
-                } else if (rng < homeScoreProb + awayScoreProb) {
-                    executeGoalScoredLogic(aName, hName, 'A');
-                }
+            
+            if (simMinute > 55 && simMinute % 6 === 0) {
+                let proxyObj = { home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed };
+                runAIReactiveSubs(proxyObj, false);
+                activeMatchSimulation.homeSubsUsed = proxyObj.hSubsUsed;
+                activeMatchSimulation.awaySubsUsed = proxyObj.aSubsUsed;
             }
+
+            activeMatchSimulation.sideFixtures.forEach(f => {
+                processInjuriesRngCheck(f.home || f.teamA, f.hLineup, 'H', true, f);
+                processInjuriesRngCheck(f.away || f.teamB, f.aLineup, 'A', true, f);
+                if (simMinute > 55 && simMinute % 6 === 0) runAIReactiveSubs(f, false);
+                
+                simulateMatchCalculationsForMinute(f.home || f.teamA, f.away || f.teamB, f.hLineup, f.aLineup, f, false);
+            });
+
+            let dummyRef = { hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore };
+            simulateMatchCalculationsForMinute(activeMatchSimulation.home, activeMatchSimulation.away, activeMatchSimulation.homeLineup, activeMatchSimulation.awayLineup, dummyRef, true);
+            activeMatchSimulation.homeScore = dummyRef.hScore;
+            activeMatchSimulation.awayScore = dummyRef.aScore;
+
+            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.homeScore} - ${activeMatchSimulation.awayScore}`;
+            renderLiveTeamSheets();
+            renderSideLiveMatchesList();
 
             if (!activeMatchSimulation.extraTime && simMinute === 90) {
                 if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
@@ -1427,113 +1545,170 @@
             }
         }
 
-        function triggerHalftimeBoard() {
-            clearInterval(matchIntervalTimer);
-            isSimPaused = true;
-            
-            let modal = document.getElementById('sub-modal-overlay');
-            modal.classList.add('active');
-            
-            document.getElementById('sub-modal-title').innerText = "☕ Half-Time Tactical Roster Exchange";
-            document.getElementById('sub-modal-desc').innerText = "Adjust formation structures or make swaps. Half-time modifications do not spend regular cap limits.";
-            document.getElementById('modal-cancel-btn').style.display = "none"; 
+        function simulateMatchCalculationsForMinute(hName, aName, hLineup, aLineup, matchObjRef, isFeaturedGame) {
+            let hP = calculateLiveLineupPowers(teams[hName], hLineup);
+            let aP = calculateLiveLineupPowers(teams[aName], aLineup);
 
-            renderSubstitutionModalLists();
+            // Calibrated attack curve logic to drive ~3.4 - 3.8 goal distributions per game tournament-wide
+            if (Math.random() < 0.098) {
+                let attackingBonus = (simMinute <= 45 || (simMinute > 90 && simMinute <= 105)) ? 1.05 : 1.15;
+                let homeAttackPower = (hP.fw * 1.35 + hP.mf * 0.6) * attackingBonus;
+                let awayAttackPower = (aP.fw * 1.35 + aP.mf * 0.6) * attackingBonus;
+                let homeDefendingPower = hP.df * 0.95 + hP.gk * 0.85;
+                let awayDefendingPower = aP.df * 0.95 + aP.gk * 0.85;
+
+                let homeGoalProb = (homeAttackPower / (homeAttackPower + awayDefendingPower)) * 0.22;
+                let awayGoalProb = (awayAttackPower / (awayAttackPower + homeDefendingPower)) * 0.22;
+
+                let choiceRng = Math.random();
+                if (choiceRng < homeGoalProb) {
+                    executeRosterGoalLogic(hName, hLineup, matchObjRef, 'H', isFeaturedGame);
+                } else if (choiceRng < homeGoalProb + awayGoalProb) {
+                    executeRosterGoalLogic(aName, aLineup, matchObjRef, 'A', isFeaturedGame);
+                }
+            }
         }
 
-        function processInjuriesRngCheck(countryName, activeLineupArray, sideFlag) {
-            if (Math.random() > 0.0006) return; 
+        function executeRosterGoalLogic(attackerTeam, lineup, matchObjRef, side, isFeaturedGame) {
+            let eligible = teams[attackerTeam].players.filter(p => lineup.includes(p.FullName) && !p.isInjured);
+            if (eligible.length === 0) return;
 
-            let validPlayers = teams[countryName].players.filter(p => activeLineupArray.includes(p.FullName) && !p.isInjured);
-            if (validPlayers.length === 0) return;
-
-            let totalWeight = 0;
-            let weights = validPlayers.map(p => {
-                let positionWeight = (p.Position === 'GK') ? 1 : 4; 
-                let fatigueWeight = 1 + (p.Fatigue / 20); 
-                let w = positionWeight * fatigueWeight;
-                totalWeight += w;
+            let totalScoringWeight = 0;
+            let weights = eligible.map(p => {
+                let w = p.BaseAbility * 0.1;
+                if (p.Position === 'FW') w += 20;
+                if (p.Position === 'MF') w += 8;
+                totalScoringWeight += w;
                 return w;
             });
 
-            let rng = Math.random() * totalWeight;
-            let chosenPlayer = validPlayers[0];
-            let currentSum = 0;
-            for(let i=0; i<validPlayers.length; i++) {
-                currentSum += weights[i];
-                if (rng <= currentSum) {
-                    chosenPlayer = validPlayers[i];
+            let scoreRng = Math.random() * totalScoringWeight;
+            let scorer = eligible[0];
+            let accumulated = 0;
+            for (let i = 0; i < eligible.length; i++) {
+                accumulated += weights[i];
+                if (scoreRng <= accumulated) {
+                    scorer = eligible[i];
                     break;
                 }
             }
 
+            let assister = null;
+            let assistCandidates = eligible.filter(p => p !== scorer && p.Position !== 'GK');
+            if (assistCandidates.length > 0 && Math.random() < 0.72) {
+                assister = assistCandidates[Math.floor(Math.random() * assistCandidates.length)];
+            }
+
+            scorer.Goals++;
+            if (assister) assister.Assists++;
+
+            if (side === 'H') matchObjRef.hScore++; else matchObjRef.aScore++;
+
+            if (isFeaturedGame) {
+                let log = `⚽ GOAL! ${scorer.FullName} powers it into the net!`;
+                if (assister) log += ` Beautifully assisted by ${assister.FullName}.`;
+                log += ` (${attackerTeam})`;
+                appendCommentaryLine(simMinute, "goal", log);
+            }
+        }
+
+        function runAIReactiveSubs(f, isHalftime) {
+            let hName = f.home || f.teamA;
+            let aName = f.away || f.teamB;
+
+            if (hName !== userTeam) executeSingleAIReactiveSub(hName, f.hLineup, f.hSubsUsed, f.hScore, f.aScore, isHalftime, count => f.hSubsUsed = count);
+            if (aName !== userTeam) executeSingleAIReactiveSub(aName, f.aLineup, f.aSubsUsed, f.aScore, f.hScore, isHalftime, count => f.aSubsUsed = count);
+        }
+
+        function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
+            if (currentSubsCount >= MaxUserSubs) return;
+
+            let team = teams[countryName];
+            let shouldSubstitute = isHalftime || (teamScore < opponentScore && Math.random() < 0.45) || Math.random() < 0.15;
+            if (!shouldSubstitute) return;
+
+            let bench = team.players.filter(p => !activeLineup.includes(p.FullName) && !p.Suspended && !p.isInjured && p.matchStatus !== 'subbed-off');
+            if (bench.length === 0) return;
+
+            let outfieldOnPitch = team.players.filter(p => activeLineup.includes(p.FullName) && p.Position !== 'GK');
+            if (outfieldOnPitch.length === 0) return;
+
+            outfieldOnPitch.sort((a,b) => (a.isInjured ? -100 : 0) + (a.Fatigue - b.Fatigue) + (getEffectiveAbility(a) - getEffectiveAbility(b)));
+            let outgoing = outfieldOnPitch[0];
+
+            let idealPosition = (teamScore < opponentScore) ? 'FW' : outgoing.Position;
+            let incoming = bench.find(p => p.Position === idealPosition) || bench.find(p => p.Position === 'MF') || bench[0];
+
+            if (incoming && incoming.Position !== 'GK') {
+                let idx = activeLineup.indexOf(outgoing.FullName);
+                if (idx > -1) {
+                    activeLineup[idx] = incoming.FullName;
+                    outgoing.matchStatus = 'subbed-off';
+                    incoming.matchStatus = 'subbed-on';
+                    currentSubsCount++;
+                    updateSubCountCallback(currentSubsCount);
+                    
+                    if (countryName === activeMatchSimulation.home || countryName === activeMatchSimulation.away) {
+                        appendCommentaryLine(simMinute, "INFO", `🔄 Tactical AI Sub (${countryName}): ${outgoing.FullName} off ➔ ${incoming.FullName} on.`);
+                    }
+                }
+            }
+        }
+
+        function processInjuriesRngCheck(countryName, activeLineupArray, sideFlag, isSideMatch = false, sideMatchObj = null) {
+            if (Math.random() > 0.0018) return; 
+
+            let validPlayers = teams[countryName].players.filter(p => activeLineupArray.includes(p.FullName) && !p.isInjured);
+            if (validPlayers.length === 0) return;
+
+            let chosenPlayer = validPlayers[Math.floor(Math.random() * validPlayers.length)];
             chosenPlayer.isInjured = true;
-            appendCommentaryLine(simMinute, "REDCARD", `🚑 CRITICAL INJURY! ${chosenPlayer.FullName} (${countryName}) suffers a heavy blow and is forced to leave the pitch.`);
+            chosenPlayer.matchStatus = 'subbed-off';
 
-            let subsCount = (sideFlag === 'H') ? activeMatchSimulation.homeSubsUsed : activeMatchSimulation.awaySubsUsed;
-            let benchAvailable = teams[countryName].players.filter(p => !activeLineupArray.includes(p.FullName) && !p.Suspended && !p.isInjured);
+            if (!isSideMatch) {
+                appendCommentaryLine(simMinute, "REDCARD", `🚑 FORCED INJURY! ${chosenPlayer.FullName} (${countryName}) is carried off the field.`);
+            }
 
-            if (countryName === userTeam) {
+            let subsCount = isSideMatch ? (sideFlag === 'H' ? sideMatchObj.hSubsUsed : sideMatchObj.aSubsUsed) : (sideFlag === 'H' ? activeMatchSimulation.homeSubsUsed : activeMatchSimulation.awaySubsUsed);
+            let benchAvailable = teams[countryName].players.filter(p => !activeLineupArray.includes(p.FullName) && !p.Suspended && !p.isInjured && p.matchStatus !== 'subbed-off');
+
+            if (countryName === userTeam && !isSideMatch) {
                 isSimPaused = true;
                 clearInterval(matchIntervalTimer);
                 
                 let modal = document.getElementById('sub-modal-overlay');
                 modal.classList.add('active');
                 
-                document.getElementById('sub-modal-title').innerText = "🚑 Emergency Injury Substitution Required";
-                document.getElementById('sub-modal-desc').innerText = `${chosenPlayer.FullName} must come off immediately. Select a standard fit replacement from your bench reservoir.`;
-                document.getElementById('modal-cancel-btn').style.display = "none";
+                document.getElementById('sub-modal-title').innerText = "🚑 Emergency Injury Substitution Board";
+                document.getElementById('sub-modal-desc').innerText = `${chosenPlayer.FullName} must be replaced. (Deducts from your 5-sub cap).`;
+                document.getElementById('modal-cancel-btn').style.display = "none"; 
 
                 window.forcedInjuryOffPlayer = chosenPlayer.FullName;
                 renderSubstitutionModalLists();
             } else {
-                if (benchAvailable.length > 0 && (subsCount < MaxUserSubs || isHalftimeBreak)) {
-                    let eligibleRep = benchAvailable.filter(p => p.Position === chosenPlayer.Position)[0] || benchAvailable[0];
+                let replacement = null;
+                if (chosenPlayer.Position === 'GK') {
+                    replacement = benchAvailable.find(p => p.Position === 'GK');
+                } else {
+                    replacement = benchAvailable.find(p => p.Position === chosenPlayer.Position) || benchAvailable.find(p => p.Position !== 'GK');
+                }
+
+                if (replacement && subsCount < MaxUserSubs) {
                     let idx = activeLineupArray.indexOf(chosenPlayer.FullName);
                     if (idx > -1) {
-                        activeLineupArray[idx] = eligibleRep.FullName;
+                        activeLineupArray[idx] = replacement.FullName;
+                        replacement.matchStatus = 'subbed-on';
                     }
-                    if (!isHalftimeBreak) {
+                    if (isSideMatch) {
+                        if (sideFlag === 'H') sideMatchObj.hSubsUsed++; else sideMatchObj.aSubsUsed++;
+                    } else {
                         if (sideFlag === 'H') activeMatchSimulation.homeSubsUsed++; else activeMatchSimulation.awaySubsUsed++;
+                        appendCommentaryLine(simMinute, "INFO", `🔄 Emergency Replacement: ${replacement.FullName} subbed on.`);
                     }
-                    appendCommentaryLine(simMinute, "INFO", `🔄 Auto-Sub: ${eligibleRep.FullName} enters to replace injured player.`);
-                } else {
-                    appendCommentaryLine(simMinute, "REDCARD", `⚠️ Squad Cap Exhausted! ${countryName} cannot make substitutions. They are down to 10 players, and the injured slot contributes 0 ability points.`);
+                } else if (!isSideMatch) {
+                    appendCommentaryLine(simMinute, "REDCARD", `⚠️ Roster Restricted! ${countryName} has no remaining substitutions and must play down a player.`);
                 }
-                updateLivePowerDisplayGrid();
             }
-        }
-
-        function executeGoalScoredLogic(attackerTeamName, defenderTeamName, scoringSideFlag) {
-            let lineup = (scoringSideFlag === 'H') ? activeMatchSimulation.homeLineup : activeMatchSimulation.awayLineup;
-            let teamFit = teams[attackerTeamName].players.filter(p => lineup.includes(p.FullName) && !p.isInjured);
-            
-            if (teamFit.length === 0) return;
-
-            let scorersList = teamFit.filter(p => p.Position === 'FW' || p.Position === 'MF');
-            if(scorersList.length === 0) scorersList = teamFit;
-            let scorer = scorersList[Math.floor(Math.random() * scorersList.length)];
-
-            let assistList = teamFit.filter(p => p !== scorer && p.Position !== 'GK');
-            let assister = null;
-            if (assistList.length > 0 && Math.random() < 0.65) {
-                assister = assistList[Math.floor(Math.random() * assistList.length)];
-            }
-
-            scorer.Goals++;
-            if(assister) assister.Assists++;
-
-            if (scoringSideFlag === 'H') activeMatchSimulation.homeScore++; 
-            else activeMatchSimulation.awayScore++;
-
-            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.homeScore} - ${activeMatchSimulation.awayScore}`;
-
-            let txt = `⚽ GOALLL!! ${scorer.FullName} blasts it home into the corner net!`;
-            if (assister) txt += ` Brilliant assist provided by ${assister.FullName}.`;
-            txt += ` (${attackerTeamName})`;
-
-            appendCommentaryLine(simMinute, "goal", txt);
-            activeMatchSimulation.scorers.push({ minute: simMinute, team: attackerTeamName, name: scorer.FullName });
         }
 
         function executePenaltyShootoutCalculations() {
@@ -1571,12 +1746,12 @@
         function triggerTacticalPause() {
             let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
             if (!isUserInvolved || teams[userTeam].eliminated) {
-                return alert("Viewer Model active. Tactical coaching controls are disabled.");
+                return alert("Tactical coaching controls are disabled for viewers.");
             }
 
             let pauseCount = (activeMatchSimulation.home === userTeam) ? activeMatchSimulation.homePausesUsed : activeMatchSimulation.awayPausesUsed;
             if (pauseCount >= MaxUserPauses) {
-                return alert("Roster coaching limits reached! No remaining pause commands available.");
+                return alert("Tactical coaching window cap reached!");
             }
 
             clearInterval(matchIntervalTimer);
@@ -1615,7 +1790,7 @@
                 let btn = document.createElement('button');
                 btn.className = 'sub-item-btn';
                 
-                let detail = p.Suspended ? '[SUSP]' : (p.isInjured ? '[INJ]' : `Ability ${getEffectiveAbility(p)}`);
+                let detail = p.Suspended ? '[SUSP]' : (p.isInjured ? '[INJ]' : `Rating ${getEffectiveAbility(p)}`);
                 btn.innerText = `[${p.Position}] ${p.FullName} (${detail})`;
 
                 if (isCurrentOnField) {
@@ -1633,7 +1808,7 @@
                         pitchList.appendChild(btn);
                     }
                 } else {
-                    if (p.Suspended || p.isInjured) {
+                    if (p.Suspended || p.isInjured || p.matchStatus === 'subbed-off') {
                         btn.disabled = true;
                         btn.style.opacity = 0.3;
                     } else {
@@ -1651,42 +1826,54 @@
         function confirmManagerSubstitution() {
             let errSpan = document.getElementById('modal-sub-error');
             if (!window.selectedPitchSubId || !window.selectedBenchSubId) {
-                errSpan.innerText = "Error: Make sure to select both players.";
+                errSpan.innerText = "Error: Please select both slots.";
                 return;
             }
 
             let lineup = (activeMatchSimulation.home === userTeam) ? activeMatchSimulation.homeLineup : activeMatchSimulation.awayLineup;
+            let team = teams[userTeam];
             let subsCount = (activeMatchSimulation.home === userTeam) ? activeMatchSimulation.homeSubsUsed : activeMatchSimulation.awaySubsUsed;
 
-            if (subsCount >= MaxUserSubs && !isHalftimeBreak && !window.forcedInjuryOffPlayer) {
-                errSpan.innerText = "Error: Allocation cap reached. Maximum 5 entries.";
+            if (subsCount >= MaxUserSubs) {
+                errSpan.innerText = "Error: Allocation cap reached. Maximum 5 substitutions allowed.";
                 return;
             }
 
-            let idx = lineup.indexOf(window.selectedPitchSubId);
-            if (idx > -1) {
-                lineup[idx] = window.selectedBenchSubId;
+            let outgoingPlayer = team.players.find(p => p.FullName === window.selectedPitchSubId);
+            let incomingPlayer = team.players.find(p => p.FullName === window.selectedBenchSubId);
+
+            let temporaryLineup = [...lineup];
+            let targetIndex = temporaryLineup.indexOf(window.selectedPitchSubId);
+            if (targetIndex > -1) temporaryLineup[targetIndex] = window.selectedBenchSubId;
+
+            let gkOnPitchCount = team.players.filter(p => temporaryLineup.includes(p.FullName) && p.Position === 'GK').length;
+            if (gkOnPitchCount !== 1) {
+                errSpan.innerText = "Invalid Setup: Tactical setups require exactly 1 Goalkeeper on field.";
+                return;
             }
 
-            if (!isHalftimeBreak) {
-                if (activeMatchSimulation.home === userTeam) activeMatchSimulation.homeSubsUsed++; 
-                else activeMatchSimulation.awaySubsUsed++;
+            lineup[targetIndex] = window.selectedBenchSubId;
+            outgoingPlayer.matchStatus = 'subbed-off';
+            incomingPlayer.matchStatus = 'subbed-on';
+
+            if (activeMatchSimulation.home === userTeam) {
+                activeMatchSimulation.homeSubsUsed++;
+                if (!isHalftimeBreak && !window.forcedInjuryOffPlayer) activeMatchSimulation.homePausesUsed++;
+            } else {
+                activeMatchSimulation.awaySubsUsed++;
+                if (!isHalftimeBreak && !window.forcedInjuryOffPlayer) activeMatchSimulation.awayPausesUsed++;
             }
 
-            if (!window.forcedInjuryOffPlayer && !isHalftimeBreak) {
-                if (activeMatchSimulation.home === userTeam) activeMatchSimulation.homePausesUsed++; 
-                else activeMatchSimulation.awayPausesUsed++;
-            }
-
-            appendCommentaryLine(simMinute, "info", `🔄 Strategic Sub executed: ${window.selectedPitchSubId} off ➔ ${window.selectedBenchSubId} on.`);
-            
             window.forcedInjuryOffPlayer = null;
-            closeSubModal();
+
+            appendCommentaryLine(simMinute, "info", `🔄 Swap executed: ${window.selectedPitchSubId} off ➔ ${window.selectedBenchSubId} on.`);
+            
+            document.getElementById('sub-modal-overlay').classList.remove('active');
             updateLivePowerDisplayGrid();
+            renderLiveTeamSheets();
 
             if (isHalftimeBreak) {
-                renderSubstitutionModalLists();
-                alert("Roster adjustments registered successfully! You can execute further swaps or resume the game.");
+                isSimPaused = true;
             } else {
                 resumeMatchTimerTick();
             }
@@ -1694,7 +1881,7 @@
 
         function closeSubModal() {
             if (window.forcedInjuryOffPlayer) {
-                alert("Critical error: You must replace your injured player before resuming the match.");
+                alert("Roster configuration mismatch! Replace your injured player before turning off the dashboard.");
                 return;
             }
             document.getElementById('sub-modal-overlay').classList.remove('active');
@@ -1718,21 +1905,21 @@
             }
 
             clearInterval(matchIntervalTimer);
-            matchIntervalTimer = setInterval(tickSimulationMinute, 200);
+            matchIntervalTimer = setInterval(tickSimulationMinute, 150);
         }
 
         function resumeFromHalftimeBreak() {
             isHalftimeBreak = false;
             isSimPaused = false;
             
-            document.getElementById('sub-modal-overlay').classList.remove('active');
             document.getElementById('match-halftime-btn').style.display = "none";
+            document.getElementById('match-resume-ht-btn').style.display = "none";
             document.getElementById('match-pause-btn').style.display = "inline-block";
             
             appendCommentaryLine(45, "INFO", "▶️ SECOND HALF KICKOFF! The simulation resumes.");
             
             clearInterval(matchIntervalTimer);
-            matchIntervalTimer = setInterval(tickSimulationMinute, 200);
+            matchIntervalTimer = setInterval(tickSimulationMinute, 150);
         }
 
         function skipMatchAnimation() {
@@ -1748,44 +1935,32 @@
                 
                 processInjuriesRngCheck(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'H');
                 processInjuriesRngCheck(activeMatchSimulation.away, activeMatchSimulation.awayLineup, 'A');
-
-                let hP = calculateLiveLineupPowers(teams[activeMatchSimulation.home], activeMatchSimulation.homeLineup);
-                let aP = calculateLiveLineupPowers(teams[activeMatchSimulation.away], activeMatchSimulation.awayLineup);
-
-                if (Math.random() < 0.05) {
-                    let phaseBonus = (simMinute <= 45 || (simMinute > 90 && simMinute <= 105)) ? 1.0 : 1.05;
-                    let homeChance = (hP.fw + hP.mf/2) * phaseBonus;
-                    let awayChance = (aP.fw + aP.mf/2) * phaseBonus;
-                    let homeDef = hP.df + hP.gk;
-                    let awayDef = aP.df + aP.gk;
-
-                    let homeScoreProb = (homeChance / (homeChance + awayDef)) * 0.14;
-                    let awayScoreProb = (awayChance / (awayChance + homeDef)) * 0.14;
-
-                    let rng = Math.random();
-                    if (rng < homeScoreProb) {
-                        executeGoalScoredLogic(activeMatchSimulation.home, activeMatchSimulation.away, 'H');
-                    } else if (rng < homeScoreProb + awayScoreProb) {
-                        executeGoalScoredLogic(activeMatchSimulation.away, activeMatchSimulation.home, 'A');
-                    }
-                }
-            }
-
-            activeMatchSimulation.sideFixtures.forEach(f => {
-                Object.keys(f.timelineEvents).forEach(m => {
-                    let minInt = parseInt(m, 10);
-                    if (minInt > simMinute) {
-                        let ev = f.timelineEvents[m];
-                        if(ev.type === 'GOAL') { if(ev.side==='H') f.hScore++; else f.aScore++; }
-                    }
+                
+                activeMatchSimulation.sideFixtures.forEach(f => {
+                    processInjuriesRngCheck(f.home || f.teamA, f.hLineup, 'H', true, f);
+                    processInjuriesRngCheck(f.away || f.teamB, f.aLineup, 'A', true, f);
+                    if (simMinute > 55 && simMinute % 6 === 0) runAIReactiveSubs(f, false);
+                    simulateMatchCalculationsForMinute(f.home || f.teamA, f.away || f.teamB, f.hLineup, f.aLineup, f, false);
                 });
-                f.played = true;
-            });
+
+                if (simMinute > 55 && simMinute % 6 === 0) {
+                    let proxyObj = { home: activeMatchSimulation.home, away: activeMatchSimulation.away, hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore, hLineup: activeMatchSimulation.homeLineup, aLineup: activeMatchSimulation.awayLineup, hSubsUsed: activeMatchSimulation.homeSubsUsed, aSubsUsed: activeMatchSimulation.awaySubsUsed };
+                    runAIReactiveSubs(proxyObj, false);
+                    activeMatchSimulation.homeSubsUsed = proxyObj.hSubsUsed;
+                    activeMatchSimulation.awaySubsUsed = proxyObj.aSubsUsed;
+                }
+
+                let dummyRef = { hScore: activeMatchSimulation.homeScore, aScore: activeMatchSimulation.awayScore };
+                simulateMatchCalculationsForMinute(activeMatchSimulation.home, activeMatchSimulation.away, activeMatchSimulation.homeLineup, activeMatchSimulation.awayLineup, dummyRef, true);
+                activeMatchSimulation.homeScore = dummyRef.hScore;
+                activeMatchSimulation.awayScore = dummyRef.aScore;
+            }
 
             if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
                 executePenaltyShootoutCalculations();
             }
 
+            renderLiveTeamSheets();
             concludeActiveSimulationRun();
         }
 
@@ -1797,6 +1972,7 @@
             document.getElementById('match-skip-btn').style.display = 'none';
             document.getElementById('match-pause-btn').disabled = true;
             document.getElementById('match-halftime-btn').style.display = "none";
+            document.getElementById('match-resume-ht-btn').style.display = "none";
             document.getElementById('match-continue-btn').style.display = 'inline-block';
 
             appendCommentaryLine(simMinute, "INFO", "🏁 MATCH DECLARED CONCLUDED. Check all finalized scorelines.");
@@ -1828,15 +2004,6 @@
             teams[hName].gf += hScore; teams[hName].ga += aScore; teams[hName].gd = teams[hName].gf - teams[hName].ga;
             teams[aName].gf += aScore; teams[aName].ga += hScore; teams[aName].gd = teams[aName].gf - teams[aName].ga;
 
-            if (hScore === 0) {
-                let k = teams[aName].players.find(p => teams[aName].selectedLineupIds.includes(p.FullName) && p.Position === 'GK');
-                if (k) k.CleanSheets++;
-            }
-            if (aScore === 0) {
-                let k = teams[hName].players.find(p => teams[hName].selectedLineupIds.includes(p.FullName) && p.Position === 'GK');
-                if (k) k.CleanSheets++;
-            }
-
             activeMatchSimulation.sideFixtures.forEach(f => {
                 let home = f.home || f.teamA;
                 let away = f.away || f.teamB;
@@ -1846,22 +2013,15 @@
                 if (hs === as && !activeMatchSimulation.isKnockout) {
                     teams[home].drawn++; teams[away].drawn++;
                     teams[home].points += 1; teams[away].points += 1;
-                    teams[home].MatchH2HMap[away] = 'drawn'; teams[away].MatchH2HMap[home] = 'drawn';
-                } else if (hs > as || (f.timelineEvents['PEN_WIN'] === 'H')) {
+                } else if (hs > as) {
                     teams[home].won++; teams[away].lost++;
                     teams[home].points += 3;
-                    teams[home].MatchH2HMap[away] = 'won'; teams[away].MatchH2HMap[home] = 'lost';
                 } else {
                     teams[away].won++; teams[home].lost++;
                     teams[away].points += 3;
-                    teams[home].MatchH2HMap[away] = 'lost'; teams[away].MatchH2HMap[home] = 'won';
                 }
-
                 teams[home].gf += hs; teams[home].ga += as; teams[home].gd = teams[home].gf - teams[home].ga;
                 teams[away].gf += as; teams[away].ga += hs; teams[away].gd = teams[away].gf - teams[away].ga;
-
-                if(hs === 0) { let k = teams[away].players.find(p => p.Position === 'GK'); if(k) k.CleanSheets++; }
-                if(as === 0) { let k = teams[home].players.find(p => p.Position === 'GK'); if(k) k.CleanSheets++; }
             });
 
             Object.keys(teams).forEach(cName => {
@@ -1895,38 +2055,30 @@
 
         function evaluateGroupStageStandingsProgression() {
             let qualified = [];
-            let thirdPlaceTeams = [];
-
+            
             Object.keys(groups).sort().forEach(gName => {
                 let sorted = getSortedGroupTeams(gName);
                 sorted.forEach((tName, i) => {
                     if (i < 2) {
                         qualified.push(tName);
                         teams[tName].stageReached = 'Round of 32';
-                    } else if (i === 2) {
-                        thirdPlaceTeams.push(tName);
-                    } else {
-                        teams[tName].eliminated = true;
-                        teams[tName].stageReached = 'Group Stage Eliminated';
                     }
                 });
             });
 
-            thirdPlaceTeams.sort((a,b) => {
-                if(teams[b].points !== teams[a].points) return teams[b].points - teams[a].points;
-                if(teams[b].gd !== teams[a].gd) return teams[b].gd - teams[a].gd;
-                return teams[b].gf - teams[a].gf;
-            });
-
-            let best4Thirds = thirdPlaceTeams.slice(0, 4);
-            best4Thirds.forEach(tName => {
+            let sortedThirds = getCalculatedThirdsList();
+            let best8Thirds = sortedThirds.slice(0, 8);
+            
+            best8Thirds.forEach(tName => {
                 qualified.push(tName);
                 teams[tName].stageReached = 'Round of 32';
             });
 
-            thirdPlaceTeams.slice(4).forEach(tName => {
-                teams[tName].eliminated = true;
-                teams[tName].stageReached = 'Group Stage Eliminated';
+            Object.keys(teams).forEach(tName => {
+                if (!qualified.includes(tName)) {
+                    teams[tName].eliminated = true;
+                    teams[tName].stageReached = 'Group Stage Eliminated';
+                }
             });
 
             knockoutRoundName = 'Round of 32';
@@ -1952,8 +2104,7 @@
 
             for (let i = 0; i < arr.length; i += 2) {
                 knockoutMatches.push({
-                    teamA: arr[i],
-                    teamB: arr[i+1],
+                    teamA: arr[i], teamB: arr[i+1],
                     scoreA: undefined, scoreB: undefined,
                     penA: undefined, penB: undefined,
                     played: false
@@ -1994,9 +2145,7 @@
                 }
             });
 
-            if (survivors.length === 1) {
-                return endTournament(survivors[0]);
-            }
+            if (survivors.length === 1) return endTournament(survivors[0]);
 
             if (survivors.length === 16) knockoutRoundName = 'Round of 16';
             else if (survivors.length === 8) knockoutRoundName = 'Quarterfinals';
@@ -2005,7 +2154,6 @@
 
             buildPairingsFromArray(survivors);
             knockoutHistoryTree[knockoutRoundName] = [...knockoutMatches];
-
             survivors.forEach(cName => { if(cName !== userTeam) autoPickStartingLineup(cName); });
 
             showScreen('screen-dashboard');
