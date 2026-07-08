@@ -291,7 +291,7 @@
         .commentary-box {
             background: #050505;
             border-radius: 6px;
-            height: 300px;
+            height: 320px;
             overflow-y: auto;
             padding: 15px;
             font-family: 'Courier New', Courier, monospace;
@@ -483,7 +483,7 @@
                         </select>
                     </div>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
-                        Pick exactly 1 GK and 10 outfielders. Tired players suffer minor ability drops. Suspended players cannot perform.
+                        Pick exactly 1 GK and 10 outfielders. Tired players suffer minor drops. Injured players remain unavailable based on severity.
                     </p>
                     
                     <div class="rating-box">
@@ -793,7 +793,9 @@
                     Goals: 0,
                     Assists: 0,
                     CleanSheets: 0,
-                    isInjured: false,
+                    injurySeverity: null, 
+                    injuryDurationLeft: 0, 
+                    inMatchInjured: false, 
                     matchStatus: 'bench'
                 };
                 playersRaw.push(player);
@@ -888,7 +890,9 @@
         }
 
         function getEffectiveAbility(player) {
-            if (player.Suspended || player.isInjured) return 0;
+            if (player.Suspended || player.injuryDurationLeft > 0 || player.injurySeverity === 'tournament' || player.inMatchInjured) {
+                return 0;
+            }
             let nerf = Math.floor(player.Fatigue / 15); 
             let eff = player.BaseAbility - nerf;
             return eff < 10 ? 10 : eff;
@@ -898,7 +902,7 @@
             let team = teams[countryName];
             let config = FORMATIONS[team.currentFormation] || FORMATIONS["4-4-2"];
 
-            let available = team.players.filter(p => !p.Suspended && !p.isInjured).sort((a,b) => getEffectiveAbility(b) - getEffectiveAbility(a));
+            let available = team.players.filter(p => !p.Suspended && p.injuryDurationLeft <= 0 && p.injurySeverity !== 'tournament').sort((a,b) => getEffectiveAbility(b) - getEffectiveAbility(a));
             
             let gks = available.filter(p => p.Position === 'GK');
             let dfs = available.filter(p => p.Position === 'DF');
@@ -964,12 +968,19 @@
                 let isSelected = team.selectedLineupIds.includes(p.FullName);
                 let isChecked = isSelected ? 'checked' : '';
                 
-                let isUnavailable = p.Suspended || p.isInjured;
+                let isUnavailable = p.Suspended || p.injuryDurationLeft > 0 || p.injurySeverity === 'tournament';
                 row.className = `player-row ${isUnavailable ? 'disabled' : ''}`;
                 
                 let effAbility = getEffectiveAbility(p);
-                let statusText = p.Suspended ? `<span style="color:var(--fw-color); font-weight:bold;">[SUSPENDED]</span> ` : 
-                                 (p.isInjured ? `<span style="color:var(--gold); font-weight:bold;">[INJURED]</span> ` : `Fitness: ${100 - p.Fatigue}%`);
+                
+                let statusText = `Fitness: ${100 - p.Fatigue}%`;
+                if (p.Suspended) {
+                    statusText = `<span style="color:var(--fw-color); font-weight:bold;">[SUSPENDED]</span>`;
+                } else if (p.injurySeverity === 'tournament') {
+                    statusText = `<span style="color:var(--fw-color); font-weight:bold;">[INJURED - Tournament]</span>`;
+                } else if (p.injuryDurationLeft > 0) {
+                    statusText = `<span style="color:var(--gold); font-weight:bold;">[INJURED - ${p.injuryDurationLeft} Match Left]</span>`;
+                }
 
                 row.innerHTML = `
                     <div style="display: flex; align-items: center;">
@@ -1156,7 +1167,6 @@
                 tbody.appendChild(row);
             });
 
-            // Handle the 3rd place lookup matrix view
             let thirdsBody = document.getElementById('thirds-table-body');
             thirdsBody.innerHTML = '';
             let sortedThirds = getCalculatedThirdsList();
@@ -1324,6 +1334,14 @@
                 isKnockout: isKnockoutMode,
                 extraTime: false,
                 penalties: false,
+                penRound: 0,
+                penHomeScored: 0,
+                penAwayScored: 0,
+                penHomeKicks: 0,
+                penAwayKicks: 0,
+                penHomeTakers: [],
+                penAwayTakers: [],
+                penFinished: false,
                 scorers: [],
                 allEventsTimeline: {}
             };
@@ -1340,6 +1358,9 @@
                 f.aSubsUsed = 0;
                 f.hLineup = [...teams[hN].selectedLineupIds];
                 f.aLineup = [...teams[aN].selectedLineupIds];
+                f.sidePenalties = false;
+                f.sidePenHome = 0;
+                f.sidePenAway = 0;
                 
                 setupMatchStatusesForTeam(hN, f.hLineup);
                 setupMatchStatusesForTeam(aN, f.aLineup);
@@ -1370,6 +1391,7 @@
         function setupMatchStatusesForTeam(countryName, activeLineup) {
             teams[countryName].players.forEach(p => {
                 p.matchStatus = activeLineup.includes(p.FullName) ? 'started' : 'bench';
+                p.inMatchInjured = false; 
             });
         }
 
@@ -1394,6 +1416,12 @@
             activeMatchSimulation.sideFixtures.forEach(f => {
                 let hName = f.home || f.teamA;
                 let aName = f.away || f.teamB;
+                
+                let scoreText = `${f.hScore} - ${f.aScore}`;
+                if (f.sidePenalties) {
+                    scoreText += ` (Pens: ${f.sidePenHome}-${f.sidePenAway})`;
+                }
+
                 let status = simMinute === 0 ? 'Not Started' : (simMinute >= (activeMatchSimulation.isKnockout ? 120 : 90) ? 'FT' : `Live ${simMinute}'`);
                 
                 let div = document.createElement('div');
@@ -1401,7 +1429,7 @@
                 div.style.display = 'flex'; div.style.justifyContent = 'space-between';
                 
                 div.innerHTML = `
-                    <span>⚽ ${hName} <strong>${f.hScore} - ${f.aScore}</strong> ${aName}</span>
+                    <span>⚽ ${hName} <strong>${scoreText}</strong> ${aName}</span>
                     <span style="color:var(--gold); font-size:0.75rem;">${status}</span>
                 `;
                 container.appendChild(div);
@@ -1445,7 +1473,9 @@
                 row.className = 'sheet-row';
 
                 let indicators = [];
-                if (p.isInjured) indicators.push('🚑 Injured');
+                if (p.inMatchInjured || p.injuryDurationLeft > 0 || p.injurySeverity === 'tournament') {
+                    indicators.push('🚑 Injured');
+                }
                 if (p.Suspended) indicators.push('🟥 Suspended');
                 if (p.matchStatus === 'started') indicators.push('🏃');
                 if (p.matchStatus === 'subbed-on') indicators.push('🔄 On');
@@ -1470,6 +1500,11 @@
 
         function tickSimulationMinute() {
             if (isSimPaused) return;
+
+            if (activeMatchSimulation.penalties) {
+                tickPenaltyShootoutTurn();
+                return;
+            }
 
             simMinute++;
             
@@ -1499,6 +1534,9 @@
             }
 
             let clockText = (simMinute < 10 ? '0' : '') + simMinute + ':00';
+            if (simMinute > 90) {
+                clockText = `ET ${simMinute}:00`;
+            }
             document.getElementById('match-clock').innerText = clockText;
 
             processInjuriesRngCheck(activeMatchSimulation.home, activeMatchSimulation.homeLineup, 'H');
@@ -1537,19 +1575,129 @@
                 }
             } else if (activeMatchSimulation.extraTime && simMinute === 120) {
                 if (activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
-                    executePenaltyShootoutCalculations();
-                    concludeActiveSimulationRun();
+                    initiatePenaltyShootoutSequence();
                 } else {
                     concludeActiveSimulationRun();
                 }
             }
         }
 
+        function initiatePenaltyShootoutSequence() {
+            activeMatchSimulation.penalties = true;
+            document.getElementById('match-clock').innerText = "PENS";
+            document.getElementById('match-pause-btn').disabled = true;
+            
+            appendCommentaryLine(120, "INFO", "🏆 STALEMATE AFTER EXTRA TIME! Match to be decided via structural penalty kicks.");
+
+            activeMatchSimulation.penHomeTakers = [...activeMatchSimulation.homeLineup];
+            activeMatchSimulation.penAwayTakers = [...activeMatchSimulation.awayLineup];
+
+            activeMatchSimulation.sideFixtures.forEach(f => {
+                if (f.hScore === f.aScore) {
+                    f.sidePenalties = true;
+                }
+            });
+
+            clearInterval(matchIntervalTimer);
+            matchIntervalTimer = setInterval(tickSimulationMinute, 900); 
+        }
+
+        function verifyPenaltyShootoutEarlyWinner(homeScored, awayScored, homeKicks, awayKicks, isSuddenDeath) {
+            let homeRemaining = isSuddenDeath ? 1 : (5 - homeKicks);
+            let awayRemaining = isSuddenDeath ? 1 : (5 - awayKicks);
+
+            if (homeScored > awayScored + awayRemaining) return 'home';
+            if (awayScored > homeScored + homeRemaining) return 'away';
+            
+            if (isSuddenDeath && homeKicks === awayKicks && homeScored !== awayScored) {
+                return homeScored > awayScored ? 'home' : 'away';
+            }
+            return null;
+        }
+
+        function tickPenaltyShootoutTurn() {
+            if (activeMatchSimulation.penFinished) return;
+
+            activeMatchSimulation.sideFixtures.forEach(f => {
+                if (f.sidePenalties && Math.random() < 0.15) {
+                    if (Math.random() > 0.5) f.sidePenHome++; else f.sidePenAway++;
+                }
+            });
+
+            let hK = activeMatchSimulation.penHomeKicks;
+            let aK = activeMatchSimulation.penAwayKicks;
+            let hS = activeMatchSimulation.penHomeScored;
+            let aS = activeMatchSimulation.penAwayScored;
+            let isSuddenDeath = (hK >= 5 && aK >= 5);
+
+            let earlyCheck = verifyPenaltyShootoutEarlyWinner(hS, aS, hK, aK, isSuddenDeath);
+            if (earlyCheck) {
+                finalizePenaltyShootoutWinner(earlyCheck);
+                return;
+            }
+
+            if (hK === aK) {
+                let takerName = activeMatchSimulation.penHomeTakers[hK % activeMatchSimulation.penHomeTakers.length];
+                let teamObj = teams[activeMatchSimulation.home];
+                let playerObj = teamObj.players.find(p => p.FullName === takerName);
+                
+                let hP = calculateLiveLineupPowers(teams[activeMatchSimulation.home], activeMatchSimulation.homeLineup);
+                let aP = calculateLiveLineupPowers(teams[activeMatchSimulation.away], activeMatchSimulation.awayLineup);
+
+                let converted = (Math.random() * (playerObj ? playerObj.BaseAbility : 75) > Math.random() * aP.gk * 0.7);
+                activeMatchSimulation.penHomeKicks++;
+                
+                if (converted) {
+                    activeMatchSimulation.penHomeScored++;
+                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.home}] ${takerName} converts calmly into the corner.`);
+                } else {
+                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.home}] ${takerName}'s shot is blocked or flies wide!`);
+                }
+            } else {
+                let takerName = activeMatchSimulation.penAwayTakers[aK % activeMatchSimulation.penAwayTakers.length];
+                let teamObj = teams[activeMatchSimulation.away];
+                let playerObj = teamObj.players.find(p => p.FullName === takerName);
+                
+                let hP = calculateLiveLineupPowers(teams[activeMatchSimulation.home], activeMatchSimulation.homeLineup);
+                let aP = calculateLiveLineupPowers(teams[activeMatchSimulation.away], activeMatchSimulation.awayLineup);
+
+                let converted = (Math.random() * (playerObj ? playerObj.BaseAbility : 75) > Math.random() * hP.gk * 0.7);
+                activeMatchSimulation.penAwayKicks++;
+
+                if (converted) {
+                    activeMatchSimulation.penAwayScored++;
+                    appendCommentaryLine("PENS", "goal", `🟢 GOAL! [${activeMatchSimulation.away}] ${takerName} executes the penalty perfectly.`);
+                } else {
+                    appendCommentaryLine("PENS", "redcard", `❌ MISSED! [${activeMatchSimulation.away}] ${takerName} cracks under pressure!`);
+                }
+            }
+
+            document.getElementById('match-live-score').innerText = `${activeMatchSimulation.homeScore} - ${activeMatchSimulation.awayScore} (Pens: ${activeMatchSimulation.penHomeScored}-${activeMatchSimulation.penAwayScored})`;
+            renderSideLiveMatchesList();
+
+            let postCheck = verifyPenaltyShootoutEarlyWinner(activeMatchSimulation.penHomeScored, activeMatchSimulation.penAwayScored, activeMatchSimulation.penHomeKicks, activeMatchSimulation.penAwayKicks, isSuddenDeath);
+            if (postCheck) {
+                finalizePenaltyShootoutWinner(postCheck);
+            }
+        }
+
+        function finalizePenaltyShootoutWinner(winnerCode) {
+            activeMatchSimulation.penFinished = true;
+            clearInterval(matchIntervalTimer);
+            
+            activeMatchSimulation.penA = activeMatchSimulation.penHomeScored;
+            activeMatchSimulation.penB = activeMatchSimulation.penAwayScored;
+            
+            let winCountry = (winnerCode === 'home') ? activeMatchSimulation.home : activeMatchSimulation.away;
+            appendCommentaryLine("FT", "info", `🏆 SHOOTOUT RESOLVED! ${winCountry} wins the tie breaker match!`);
+            
+            concludeActiveSimulationRun();
+        }
+
         function simulateMatchCalculationsForMinute(hName, aName, hLineup, aLineup, matchObjRef, isFeaturedGame) {
             let hP = calculateLiveLineupPowers(teams[hName], hLineup);
             let aP = calculateLiveLineupPowers(teams[aName], aLineup);
 
-            // Calibrated attack curve logic to drive ~3.4 - 3.8 goal distributions per game tournament-wide
             if (Math.random() < 0.098) {
                 let attackingBonus = (simMinute <= 45 || (simMinute > 90 && simMinute <= 105)) ? 1.05 : 1.15;
                 let homeAttackPower = (hP.fw * 1.35 + hP.mf * 0.6) * attackingBonus;
@@ -1570,7 +1718,7 @@
         }
 
         function executeRosterGoalLogic(attackerTeam, lineup, matchObjRef, side, isFeaturedGame) {
-            let eligible = teams[attackerTeam].players.filter(p => lineup.includes(p.FullName) && !p.isInjured);
+            let eligible = teams[attackerTeam].players.filter(p => lineup.includes(p.FullName) && !p.inMatchInjured && p.Position !== 'GK');
             if (eligible.length === 0) return;
 
             let totalScoringWeight = 0;
@@ -1594,7 +1742,7 @@
             }
 
             let assister = null;
-            let assistCandidates = eligible.filter(p => p !== scorer && p.Position !== 'GK');
+            let assistCandidates = eligible.filter(p => p !== scorer);
             if (assistCandidates.length > 0 && Math.random() < 0.72) {
                 assister = assistCandidates[Math.floor(Math.random() * assistCandidates.length)];
             }
@@ -1627,13 +1775,13 @@
             let shouldSubstitute = isHalftime || (teamScore < opponentScore && Math.random() < 0.45) || Math.random() < 0.15;
             if (!shouldSubstitute) return;
 
-            let bench = team.players.filter(p => !activeLineup.includes(p.FullName) && !p.Suspended && !p.isInjured && p.matchStatus !== 'subbed-off');
+            let bench = team.players.filter(p => !activeLineup.includes(p.FullName) && !p.Suspended && p.injuryDurationLeft <= 0 && p.injurySeverity !== 'tournament' && p.matchStatus !== 'subbed-off');
             if (bench.length === 0) return;
 
             let outfieldOnPitch = team.players.filter(p => activeLineup.includes(p.FullName) && p.Position !== 'GK');
             if (outfieldOnPitch.length === 0) return;
 
-            outfieldOnPitch.sort((a,b) => (a.isInjured ? -100 : 0) + (a.Fatigue - b.Fatigue) + (getEffectiveAbility(a) - getEffectiveAbility(b)));
+            outfieldOnPitch.sort((a,b) => (a.inMatchInjured ? -100 : 0) + (a.Fatigue - b.Fatigue) + (getEffectiveAbility(a) - getEffectiveAbility(b)));
             let outgoing = outfieldOnPitch[0];
 
             let idealPosition = (teamScore < opponentScore) ? 'FW' : outgoing.Position;
@@ -1656,21 +1804,35 @@
         }
 
         function processInjuriesRngCheck(countryName, activeLineupArray, sideFlag, isSideMatch = false, sideMatchObj = null) {
-            if (Math.random() > 0.0018) return; 
+            if (Math.random() > 0.0022) return; 
 
-            let validPlayers = teams[countryName].players.filter(p => activeLineupArray.includes(p.FullName) && !p.isInjured);
+            let validPlayers = teams[countryName].players.filter(p => activeLineupArray.includes(p.FullName) && !p.inMatchInjured);
             if (validPlayers.length === 0) return;
 
             let chosenPlayer = validPlayers[Math.floor(Math.random() * validPlayers.length)];
-            chosenPlayer.isInjured = true;
+            chosenPlayer.inMatchInjured = true;
             chosenPlayer.matchStatus = 'subbed-off';
 
-            if (!isSideMatch) {
-                appendCommentaryLine(simMinute, "REDCARD", `🚑 FORCED INJURY! ${chosenPlayer.FullName} (${countryName}) is carried off the field.`);
+            let rng = Math.random();
+            if (rng < 0.55) {
+                chosenPlayer.injurySeverity = 'minor';
+                chosenPlayer.Fatigue = Math.min(100, chosenPlayer.Fatigue + 40);
+                if (!isSideMatch) appendCommentaryLine(simMinute, "REDCARD", `🚑 INJURY PAUSE! ${chosenPlayer.FullName} (${countryName}) suffers a minor blow. Taken off field with major fatigue.`);
+            } else if (rng < 0.80) {
+                chosenPlayer.injurySeverity = '1game';
+                chosenPlayer.injuryDurationLeft = 1;
+                if (!isSideMatch) appendCommentaryLine(simMinute, "REDCARD", `🚑 SEVERE INJURY! ${chosenPlayer.FullName} (${countryName}) hobbles off. Diagnosed: Out for 1 upcoming match.`);
+            } else if (rng < 0.94) {
+                chosenPlayer.injurySeverity = '2games';
+                chosenPlayer.injuryDurationLeft = 2;
+                if (!isSideMatch) appendCommentaryLine(simMinute, "REDCARD", `🚑 SEVERE INJURY! ${chosenPlayer.FullName} (${countryName}) leaves in an ambulance. Diagnosed: Out for 2 upcoming matches.`);
+            } else {
+                chosenPlayer.injurySeverity = 'tournament';
+                if (!isSideMatch) appendCommentaryLine(simMinute, "REDCARD", `💔 TRAGIC INJURY! ${chosenPlayer.FullName} (${countryName}) suffers a ruptured tendon. Out for the rest of the Tournament.`);
             }
 
             let subsCount = isSideMatch ? (sideFlag === 'H' ? sideMatchObj.hSubsUsed : sideMatchObj.aSubsUsed) : (sideFlag === 'H' ? activeMatchSimulation.homeSubsUsed : activeMatchSimulation.awaySubsUsed);
-            let benchAvailable = teams[countryName].players.filter(p => !activeLineupArray.includes(p.FullName) && !p.Suspended && !p.isInjured && p.matchStatus !== 'subbed-off');
+            let benchAvailable = teams[countryName].players.filter(p => !activeLineupArray.includes(p.FullName) && !p.Suspended && p.injuryDurationLeft <= 0 && p.injurySeverity !== 'tournament' && p.matchStatus !== 'subbed-off');
 
             if (countryName === userTeam && !isSideMatch) {
                 isSimPaused = true;
@@ -1679,8 +1841,8 @@
                 let modal = document.getElementById('sub-modal-overlay');
                 modal.classList.add('active');
                 
-                document.getElementById('sub-modal-title').innerText = "🚑 Emergency Injury Substitution Board";
-                document.getElementById('sub-modal-desc').innerText = `${chosenPlayer.FullName} must be replaced. (Deducts from your 5-sub cap).`;
+                document.getElementById('sub-modal-title').innerText = "🚑 Forced Injury Substitution Board";
+                document.getElementById('sub-modal-desc').innerText = `${chosenPlayer.FullName} is injured and locked to 0 ability. Replace immediately.`;
                 document.getElementById('modal-cancel-btn').style.display = "none"; 
 
                 window.forcedInjuryOffPlayer = chosenPlayer.FullName;
@@ -1706,39 +1868,16 @@
                         appendCommentaryLine(simMinute, "INFO", `🔄 Emergency Replacement: ${replacement.FullName} subbed on.`);
                     }
                 } else if (!isSideMatch) {
-                    appendCommentaryLine(simMinute, "REDCARD", `⚠️ Roster Restricted! ${countryName} has no remaining substitutions and must play down a player.`);
+                    appendCommentaryLine(simMinute, "REDCARD", `⚠️ Roster Restricted! ${countryName} out of subs or replacements. Player remains on field with 0 active ability.`);
                 }
             }
-        }
-
-        function executePenaltyShootoutCalculations() {
-            activeMatchSimulation.penalties = true;
-            let hP = calculateLiveLineupPowers(teams[activeMatchSimulation.home], activeMatchSimulation.homeLineup);
-            let aP = calculateLiveLineupPowers(teams[activeMatchSimulation.away], activeMatchSimulation.awayLineup);
-
-            let penH = 0; let penA = 0;
-            for (let i = 0; i < 5; i++) {
-                if (Math.random() * hP.fw > Math.random() * aP.gk) penH++;
-                if (Math.random() * aP.fw > Math.random() * hP.gk) penA++;
-            }
-
-            let safetyCount = 0;
-            while (penH === penA && safetyCount < 30) {
-                safetyCount++;
-                if (Math.random() * hP.fw > Math.random() * aP.gk) penH++;
-                if (Math.random() * aP.fw > Math.random() * hP.gk) penA++;
-            }
-
-            activeMatchSimulation.penA = penH;
-            activeMatchSimulation.penB = penA;
-            appendCommentaryLine(120, "info", `🏆 PENALTY SHOOTOUT RESORT: ${activeMatchSimulation.home} [${penH}] - [${penA}] ${activeMatchSimulation.away}`);
         }
 
         function appendCommentaryLine(min, styleClass, message) {
             let box = document.getElementById('match-commentary');
             let line = document.createElement('div');
             line.className = `commentary-line ${styleClass}`;
-            line.innerText = `[${min}'] ${message}`;
+            line.innerText = (min === "PENS") ? `[PENS] ${message}` : `[${min}'] ${message}`;
             box.appendChild(line);
             box.scrollTop = box.scrollHeight;
         }
@@ -1790,7 +1929,7 @@
                 let btn = document.createElement('button');
                 btn.className = 'sub-item-btn';
                 
-                let detail = p.Suspended ? '[SUSP]' : (p.isInjured ? '[INJ]' : `Rating ${getEffectiveAbility(p)}`);
+                let detail = p.Suspended ? '[SUSP]' : (p.injurySeverity === 'tournament' ? '[INJ-TOUR]' : (p.injuryDurationLeft > 0 ? `[INJ-${p.injuryDurationLeft}G]` : `Rating ${getEffectiveAbility(p)}`));
                 btn.innerText = `[${p.Position}] ${p.FullName} (${detail})`;
 
                 if (isCurrentOnField) {
@@ -1808,7 +1947,7 @@
                         pitchList.appendChild(btn);
                     }
                 } else {
-                    if (p.Suspended || p.isInjured || p.matchStatus === 'subbed-off') {
+                    if (p.Suspended || p.injuryDurationLeft > 0 || p.injurySeverity === 'tournament' || p.matchStatus === 'subbed-off') {
                         btn.disabled = true;
                         btn.style.opacity = 0.3;
                     } else {
@@ -1905,7 +2044,7 @@
             }
 
             clearInterval(matchIntervalTimer);
-            matchIntervalTimer = setInterval(tickSimulationMinute, 150);
+            matchIntervalTimer = setInterval(tickSimulationMinute, activeMatchSimulation.penalties ? 900 : 150);
         }
 
         function resumeFromHalftimeBreak() {
@@ -1957,8 +2096,42 @@
             }
 
             if (activeMatchSimulation.isKnockout && activeMatchSimulation.homeScore === activeMatchSimulation.awayScore) {
-                executePenaltyShootoutCalculations();
+                activeMatchSimulation.penalties = true;
+                activeMatchSimulation.penHomeTakers = [...activeMatchSimulation.homeLineup];
+                activeMatchSimulation.penAwayTakers = [...activeMatchSimulation.awayLineup];
+
+                let hP = calculateLiveLineupPowers(teams[activeMatchSimulation.home], activeMatchSimulation.homeLineup);
+                let aP = calculateLiveLineupPowers(teams[activeMatchSimulation.away], activeMatchSimulation.awayLineup);
+
+                while (!activeMatchSimulation.penFinished) {
+                    let isSD = (activeMatchSimulation.penHomeKicks >= 5 && activeMatchSimulation.penAwayKicks >= 5);
+                    if (activeMatchSimulation.penHomeKicks === activeMatchSimulation.penAwayKicks) {
+                        let taker = activeMatchSimulation.penHomeTakers[activeMatchSimulation.penHomeKicks % activeMatchSimulation.penHomeTakers.length];
+                        let pObj = teams[activeMatchSimulation.home].players.find(p => p.FullName === taker);
+                        if (Math.random() * (pObj ? pObj.BaseAbility : 75) > Math.random() * aP.gk * 0.7) activeMatchSimulation.penHomeScored++;
+                        activeMatchSimulation.penHomeKicks++;
+                    } else {
+                        let taker = activeMatchSimulation.penAwayTakers[activeMatchSimulation.penAwayKicks % activeMatchSimulation.penAwayTakers.length];
+                        let pObj = teams[activeMatchSimulation.away].players.find(p => p.FullName === taker);
+                        if (Math.random() * (pObj ? pObj.BaseAbility : 75) > Math.random() * hP.gk * 0.7) activeMatchSimulation.penAwayScored++;
+                        activeMatchSimulation.penAwayKicks++;
+                    }
+
+                    let chk = verifyPenaltyShootoutEarlyWinner(activeMatchSimulation.penHomeScored, activeMatchSimulation.penAwayScored, activeMatchSimulation.penHomeKicks, activeMatchSimulation.penAwayKicks, isSD);
+                    if (chk) {
+                        activeMatchSimulation.penFinished = true;
+                        activeMatchSimulation.penA = activeMatchSimulation.penHomeScored;
+                        activeMatchSimulation.penB = activeMatchSimulation.penAwayScored;
+                    }
+                }
             }
+
+            activeMatchSimulation.sideFixtures.forEach(f => {
+                if (f.hScore === f.aScore) {
+                    f.sidePenalties = true;
+                    if (Math.random() > 0.5) { f.sidePenHome = 5; f.sidePenAway = 4; } else { f.sidePenHome = 3; f.sidePenAway = 4; }
+                }
+            });
 
             renderLiveTeamSheets();
             concludeActiveSimulationRun();
@@ -1968,7 +2141,7 @@
             clearInterval(matchIntervalTimer);
             isSimPaused = false;
             
-            document.getElementById('match-clock').innerText = activeMatchSimulation.isKnockout && activeMatchSimulation.extraTime ? "120:00" : "90:00";
+            document.getElementById('match-clock').innerText = "FT";
             document.getElementById('match-skip-btn').style.display = 'none';
             document.getElementById('match-pause-btn').disabled = true;
             document.getElementById('match-halftime-btn').style.display = "none";
@@ -1987,18 +2160,26 @@
                 savedDayResults.push({ home: f.home || f.teamA, away: f.away || f.teamB, hScore: f.hScore, aScore: f.aScore, isMain: false });
             });
 
-            if (hScore === aScore && !activeMatchSimulation.isKnockout) {
-                teams[hName].drawn++; teams[aName].drawn++;
-                teams[hName].points += 1; teams[aName].points += 1;
-                teams[hName].MatchH2HMap[aName] = 'drawn'; teams[aName].MatchH2HMap[hName] = 'drawn';
-            } else if (hScore > aScore || (activeMatchSimulation.penalties && activeMatchSimulation.penA > activeMatchSimulation.penB)) {
-                teams[hName].won++; teams[aName].lost++;
-                teams[hName].points += 3;
-                teams[hName].MatchH2HMap[aName] = 'won'; teams[aName].MatchH2HMap[hName] = 'lost';
+            if (!activeMatchSimulation.isKnockout) {
+                if (hScore === aScore) {
+                    teams[hName].drawn++; teams[aName].drawn++;
+                    teams[hName].points += 1; teams[aName].points += 1;
+                    teams[hName].MatchH2HMap[aName] = 'drawn'; teams[aName].MatchH2HMap[hName] = 'drawn';
+                } else if (hScore > aScore) {
+                    teams[hName].won++; teams[aName].lost++;
+                    teams[hName].points += 3;
+                    teams[hName].MatchH2HMap[aName] = 'won'; teams[aName].MatchH2HMap[hName] = 'lost';
+                } else {
+                    teams[aName].won++; teams[hName].lost++;
+                    teams[aName].points += 3;
+                    teams[hName].MatchH2HMap[aName] = 'lost'; teams[aName].MatchH2HMap[hName] = 'won';
+                }
             } else {
-                teams[aName].won++; teams[hName].lost++;
-                teams[aName].points += 3;
-                teams[hName].MatchH2HMap[aName] = 'lost'; teams[aName].MatchH2HMap[hName] = 'won';
+                if (hScore > aScore || (activeMatchSimulation.penalties && activeMatchSimulation.penA > activeMatchSimulation.penB)) {
+                    teams[hName].won++; teams[aName].lost++;
+                } else {
+                    teams[aName].won++; teams[hName].lost++;
+                }
             }
 
             teams[hName].gf += hScore; teams[hName].ga += aScore; teams[hName].gd = teams[hName].gf - teams[hName].ga;
@@ -2010,15 +2191,23 @@
                 let hs = f.hScore;
                 let as = f.aScore;
 
-                if (hs === as && !activeMatchSimulation.isKnockout) {
-                    teams[home].drawn++; teams[away].drawn++;
-                    teams[home].points += 1; teams[away].points += 1;
-                } else if (hs > as) {
-                    teams[home].won++; teams[away].lost++;
-                    teams[home].points += 3;
+                if (!activeMatchSimulation.isKnockout) {
+                    if (hs === as) {
+                        teams[home].drawn++; teams[away].drawn++;
+                        teams[home].points += 1; teams[away].points += 1;
+                    } else if (hs > as) {
+                        teams[home].won++; teams[away].lost++;
+                        teams[home].points += 3;
+                    } else {
+                        teams[away].won++; teams[home].lost++;
+                        teams[away].points += 3;
+                    }
                 } else {
-                    teams[away].won++; teams[home].lost++;
-                    teams[away].points += 3;
+                    if (hs > as || (f.sidePenalties && f.sidePenHome > f.sidePenAway)) {
+                        teams[home].won++; teams[away].lost++;
+                    } else {
+                        teams[away].won++; teams[home].lost++;
+                    }
                 }
                 teams[home].gf += hs; teams[home].ga += as; teams[home].gd = teams[home].gf - teams[home].ga;
                 teams[away].gf += as; teams[away].ga += hs; teams[away].gd = teams[away].gf - teams[away].ga;
@@ -2028,6 +2217,7 @@
                 let t = teams[cName];
                 let activeLineup = t.selectedLineupIds;
                 t.players.forEach(p => {
+                    p.inMatchInjured = false; 
                     if (activeLineup.includes(p.FullName)) {
                         p.Fatigue = Math.min(100, p.Fatigue + 12);
                     } else {
@@ -2038,6 +2228,15 @@
         }
 
         function finishMatchDay() {
+            Object.keys(teams).forEach(cName => {
+                teams[cName].players.forEach(p => {
+                    if (p.injuryDurationLeft > 0) {
+                        p.injuryDurationLeft--;
+                        if (p.injuryDurationLeft === 0) p.injurySeverity = null;
+                    }
+                });
+            });
+
             if (currentStage === 'Group Stage') {
                 if (currentRound < 3) {
                     currentRound++;
