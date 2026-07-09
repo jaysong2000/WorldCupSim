@@ -1520,30 +1520,23 @@
     
     if (simMinute === 45 && !isHalftimeBreak) {
         isSimPaused = true;
-        isHalftimeBreak = true;
-        clearInterval(matchIntervalTimer);
-        
-        appendCommentaryLine(45, "INFO", "☕ HALF-TIME! Press Continue to resume.");
-        
-        // Run AI halftime subs for background matches
-        activeMatchSimulation.sideFixtures.forEach(f => runAIReactiveSubs(f, true));
-        
-        // Pass null to safely trigger halftime AI substitutions for the main match
-        runAIReactiveSubs(null, true);
+    isHalftimeBreak = true;
+    clearInterval(matchIntervalTimer);
 
-        let isUserInvolved = (activeMatchSimulation.home === userTeam || activeMatchSimulation.away === userTeam);
-        if (isUserInvolved && !teams[userTeam].eliminated) {
-            document.getElementById('match-pause-btn').style.display = "none";
-            document.getElementById('match-halftime-btn').style.display = "inline-block";
-            document.getElementById('match-resume-ht-btn').style.display = "inline-block";
-        } else {
-            setTimeout(() => {
-                isSimPaused = false;
-                isHalftimeBreak = false;
-                matchIntervalTimer = setInterval(tickSimulationMinute, 150);
-            }, 1000);
-        }
-        return;
+    // 1. SAFELY PROCESS AI SUBS WITHOUT PASSING A CRASH-PRONE TEMPORARY OBJECT
+    // Pass 'null' for the active main match, and 'true' for halftime
+    runAIReactiveSubs(null, true);
+
+    // 2. FORCE BUTTONS TO ALWAYS APPEAR AT HALFTIME 
+    // This ensures that whether you're playing or watching an AI-vs-AI fixture,
+    // the controls are correctly drawn on screen.
+    document.getElementById('match-pause-btn').style.display = "none";
+    document.getElementById('match-halftime-btn').style.display = "inline-block";
+    document.getElementById('match-resume-ht-btn').style.display = "inline-block";
+    
+    // Refresh your match layout details so current sheets are readable
+    updateLiveMatchStatsUI();
+    return;
     }
 
     let clockText = (simMinute < 10 ? '0' : '') + simMinute + ':00';
