@@ -1835,7 +1835,7 @@
         }
     }
 
-       function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
+      function executeSingleAIReactiveSub(countryName, activeLineup, currentSubsCount, teamScore, opponentScore, isHalftime, updateSubCountCallback) {
     if (currentSubsCount >= MaxUserSubs) return;
 
     let team = teams[countryName];
@@ -1848,7 +1848,19 @@
     // CAP: Enforce a maximum of 3 separate substitution windows/stoppages (excluding Halftime)
     if (!isHalftime && team.subStoppagesUsed >= 3) return;
 
-    let shouldSubstitute = (Math.random() < 0.5);
+    // --- ENHANCED AI SUB MECHANIC ---
+    let shouldSubstitute = (Math.random() < 0.25);
+
+    // GUARANTEED FALLBACK: If random check fails, force substitutions at specific time thresholds
+    // to guarantee all 5 substitutions get filled by minute 90.
+    if (!shouldSubstitute && !isHalftime) {
+        if (simMinute >= 60 && currentSubsCount < 1) shouldSubstitute = true;
+        else if (simMinute >= 68 && currentSubsCount < 2) shouldSubstitute = true;
+        else if (simMinute >= 76 && currentSubsCount < 3) shouldSubstitute = true;
+        else if (simMinute >= 82 && currentSubsCount < 4) shouldSubstitute = true;
+        else if (simMinute >= 88 && currentSubsCount < 5) shouldSubstitute = true;
+    }
+
     if (!shouldSubstitute) return;
 
     // Filter bench to find available players
